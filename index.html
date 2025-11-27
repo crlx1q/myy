@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Smart Home Dashboard</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Socket.IO клиент -->
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <!-- Chart.js для графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Используем шрифт Inter -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-black text-white min-h-screen">
+
+    <!-- Контейнер индикаторов -->
+    <div class="indicators-container">
+        <!-- Индикатор подключения (сервер) -->
+        <div id="connectionIndicator" class="connection-indicator disconnected" title="Статус подключения к серверу">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+        </div>
+        
+        <!-- Индикатор микрофона -->
+        <div id="microphoneIndicator" class="microphone-indicator" title="Статус микрофона">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+        </div>
+        
+        <!-- Индикатор батареи -->
+        <div id="batteryIndicator" class="battery-indicator high" title="Уровень заряда батареи">
+            <svg class="battery-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="16" height="10" rx="2" ry="2" fill="none"></rect>
+                <line x1="18" y1="10" x2="20" y2="10" stroke-width="2" stroke-linecap="round"></line>
+                <rect id="batteryFill" x="4" y="9" width="12" height="6" fill="currentColor" rx="1"></rect>
+            </svg>
+            <span id="batteryLevel">--%</span>
+        </div>
+        
+        <!-- Индикатор оффлайн устройств -->
+        <div id="offlineDevicesIndicator" class="offline-devices-indicator hidden" title="Оффлайн устройства и датчики">
+            <div class="relative inline-block">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="offline-cloud-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                    <line x1="2" y1="2" x2="22" y2="22" stroke-width="2.5" stroke-linecap="round" class="offline-strike" />
+                </svg>
+                <span id="offlineDevicesCount" class="offline-devices-badge">0</span>
+            </div>
+            <!-- Всплывающий блок для заблокированного экрана -->
+            <div id="offlineDevicesPopup" class="offline-devices-popup hidden">
+                <div id="offlineDevicesPopupContent" class="offline-devices-popup-content">
+                    <!-- Содержимое будет добавлено динамически -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Анимация полос при выполнении голосовой команды -->
+    <div id="voiceCommandAnimation" class="voice-command-animation">
+        <div class="voice-strip voice-strip-left"></div>
+        <div class="voice-strip voice-strip-right"></div>
+    </div>
+    
+    <!-- Уведомление на заблокированном экране -->
+    <div id="screensaverNotification" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+            <h2 id="notificationTitle" class="text-3xl font-bold mb-4">Уведомление</h2>
+            <p id="notificationMessage" class="text-xl mb-6"></p>
+            <button onclick="closeNotification()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                Закрыть
+            </button>
+        </div>
+    </div>
+    
+    <!-- Модальное окно оффлайн устройств -->
+    <div id="offlineDevicesModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-white">Оффлайн устройства</h2>
+                <button onclick="closeOfflineDevicesModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="offlineDevicesContent" class="space-y-4">
+                <!-- Содержимое будет добавлено динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ==========================================
+    ЭКРАН 1: SCREENSAVER (ЗАСТАВКА)
+    ==========================================
+    -->
+    <div id="screensaverView" class="fixed inset-0 bg-black z-50 transition-opacity duration-300 relative">
+        
+        <!-- Анимации погоды -->
+        <div id="weatherAnimation" class="weather-animation"></div>
+        
+        <div class="flex flex-col p-4 md:p-8 lg:p-12 relative z-10 h-full min-h-screen">
+            <!-- Верхняя часть: Погода -->
+            <div class="flex justify-between text-2xl font-medium flex-shrink-0 pt-2 md:pt-4">
+                <!-- Погода снаружи (теперь с API) -->
+                <div class="flex flex-col items-center">
+                    <img id="outsideWeatherIcon" src="https://img.icons8.com/fluency-systems-filled/96/ffffff/sun.png" alt="Weather" class="h-16 w-16 md:h-20 md:w-20">
+                    <span class="mt-1 md:mt-2 text-base md:text-xl">Снаружи</span>
+                    <span id="outsideTemp" class="text-4xl md:text-5xl font-bold tracking-tighter">--°C</span>
+                    <span id="outsideHumidity" class="text-sm md:text-xl font-light text-gray-400">--%</span>
+                </div>
+                <!-- Погода внутри (будет из SmartThings) -->
+                <div class="flex flex-col items-center">
+                    <img src="https://img.icons8.com/fluency-systems-filled/96/3b82f6/thermometer.png" alt="Inside Temp" class="h-16 w-16 md:h-20 md:w-20">
+                    <span class="mt-1 md:mt-2 text-base md:text-xl">Дома</span>
+                    <span id="insideTemp" class="text-4xl md:text-5xl font-bold tracking-tighter">--°C</span>
+                    <span id="insideHumidity" class="text-sm md:text-xl font-light text-gray-400">--%</span>
+                </div>
+            </div>
+
+            <!-- Центральная часть: Часы (большие как в Samsung AI) -->
+            <div class="flex-grow flex flex-col items-center justify-center flex-shrink-0 py-4 md:py-8">
+                <div class="text-center">
+                    <h1 id="clockTime" class="text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[16rem] font-bold tracking-tighter leading-none">00:00</h1>
+                    <p id="clockDate" class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-400 mt-2 md:mt-4">воскресенье, 1 января</p>
+                </div>
+            </div>
+
+            <!-- Нижняя часть: Прогноз по часам с горизонтальным скроллом (жестко внизу) -->
+            <div class="flex-shrink-0 mt-auto pb-4 md:pb-6 lg:pb-8 w-full">
+                <!-- Прогноз по часам (горизонтальный скролл) -->
+                <div id="hourlyForecast" class="hourly-forecast-container w-full">
+                    <div class="hourly-forecast-scroll">
+                        <!-- Заглушка, пока не загрузится -->
+                        <div class="hourly-forecast-item">
+                            <span class="hourly-forecast-time">--:--</span>
+                            <svg class="hourly-forecast-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                            <span class="hourly-forecast-temp">--°</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Разблокировка -->
+                <p class="text-center text-lg md:text-xl lg:text-2xl font-medium text-gray-500 animate-pulse mt-2 md:mt-4">
+                    Свайп вверх для разблокировки
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ==========================================
+    ЭКРАН 2: DASHBOARD (ПАНЕЛЬ УПРАВЛЕНИЯ)
+    ==========================================
+    -->
+    <div id="dashboardView" class="max-w-7xl mx-auto p-4 md:p-8 hidden">
+        <!-- Навигация -->
+        <nav class="flex items-center justify-between mb-6 pb-4 border-b border-gray-700">
+            <div class="flex gap-2 md:gap-4">
+                <button onclick="showSection('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg bg-blue-600 text-white font-medium transition-colors">
+                    Мой Дом
+                </button>
+                <button onclick="showSection('statistics')" id="nav-statistics" class="nav-btn px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 font-medium transition-colors">
+                    Статистика
+                </button>
+                <button onclick="showSection('security')" id="nav-security" class="nav-btn px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 font-medium transition-colors">
+                    Безопасность
+                </button>
+                <button onclick="showSection('scenes')" id="nav-scenes" class="nav-btn px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 font-medium transition-colors">
+                    Сцены
+                </button>
+                <button onclick="showSection('settings')" id="nav-settings" class="nav-btn px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 font-medium transition-colors">
+                    Настройки
+                </button>
+            </div>
+            <button onclick="lockScreen()" class="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors" title="Заблокировать">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            </button>
+        </nav>
+        
+        <!-- Кнопка полноэкранного режима (только для мобильных) -->
+        <button id="fullscreenButton" class="fullscreen-button" onclick="toggleFullscreen()" title="Полноэкранный режим">
+            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <!-- Иконка для входа в полноэкранный режим -->
+                <path id="fullscreenEnterIcon" stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                <!-- Иконка для выхода из полноэкранного режима (скрыта по умолчанию) -->
+                <path id="fullscreenExitIcon" stroke-linecap="round" stroke-linejoin="round" d="M9 4v5m0 0H4m5 0l-5.25 5.25M15 4v5m0 0h5m-5 0l5.25 5.25M9 20v-5m0 0H4m5 0l-5.25-5.25M15 20v-5m0 0h5m-5 0l5.25-5.25" style="display: none;" />
+            </svg>
+        </button>
+
+        <!-- Раздел: Мой Дом -->
+        <div id="section-home" class="section-content">
+            <h1 class="text-4xl font-bold mb-6">Мой Дом</h1>
+            
+            <!-- Секция "Избранное" / Виджеты -->
+            <h2 class="text-2xl font-semibold text-gray-300 mb-4">Устройства</h2>
+            
+            <!-- Спиннер загрузки -->
+            <div id="dashboardLoader" class="flex flex-col items-center justify-center h-64">
+                <div class="loader"></div>
+                <p class="mt-4 text-gray-400">Загрузка устройств...</p>
+            </div>
+
+            <!-- Сетка виджетов -->
+            <div id="deviceWidgets" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <!-- Виджеты будут добавлены сюда -->
+            </div>
+        </div>
+
+        <!-- Раздел: Статистика -->
+        <div id="section-statistics" class="section-content hidden">
+            <h1 class="text-4xl font-bold mb-6">Статистика</h1>
+            <div id="statisticsContent">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- График температуры -->
+                    <div class="bg-gray-800 rounded-2xl p-6">
+                        <h2 class="text-2xl font-semibold mb-4">Температура</h2>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- График влажности -->
+                    <div class="bg-gray-800 rounded-2xl p-6">
+                        <h2 class="text-2xl font-semibold mb-4">Влажность</h2>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="humidityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- График энергопотребления -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Энергопотребление</h2>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="powerChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- История событий -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h2 class="text-2xl font-semibold mb-4">История событий</h2>
+                    <div id="eventsList" class="space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-400">Загрузка событий...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Раздел: Безопасность -->
+        <div id="section-security" class="section-content hidden">
+            <h1 class="text-4xl font-bold mb-6">Безопасность</h1>
+            <div id="securityContent">
+                <!-- Статусы присутствия -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Присутствие</h2>
+                    <div class="flex gap-4 mb-4">
+                        <button onclick="setPresenceStatus('home')" id="btn-home" 
+                                class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors">
+                            Я дома
+                        </button>
+                        <button onclick="setPresenceStatus('away')" id="btn-away" 
+                                class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                            Вне дома
+                        </button>
+                    </div>
+                    <div id="presenceStatus" class="text-lg">
+                        <p class="text-gray-400">Загрузка статуса...</p>
+                    </div>
+                </div>
+                
+                <!-- Режим отсутствия -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Режим отсутствия</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-lg">Включить режим отсутствия</span>
+                        <label class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="awayModeToggle" onchange="toggleAwayMode(this.checked)"
+                                   class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all"/>
+                            <label for="awayModeToggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-400">В режиме отсутствия включается охрана и выключается всё лишнее</p>
+                </div>
+                
+                <!-- Датчики безопасности -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold">Датчики безопасности</h2>
+                        <button onclick="showHiddenDevicesInSecurity()" 
+                                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors">
+                            Показать скрытые
+                        </button>
+                    </div>
+                    <div id="securitySensors" class="space-y-3">
+                        <p class="text-gray-400">Загрузка датчиков...</p>
+                    </div>
+                </div>
+                
+                <!-- IP Камеры -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">IP Камеры</h2>
+                    <div id="securityCameras" class="space-y-3">
+                        <p class="text-gray-400">Загрузка камер...</p>
+                    </div>
+                </div>
+                
+                <!-- Дверной звонок -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Дверной звонок</h2>
+                    <div id="doorbellContainer" class="space-y-3">
+                        <p class="text-gray-400">Загрузка...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Раздел: Сцены -->
+        <div id="section-scenes" class="section-content hidden">
+            <h1 class="text-4xl font-bold mb-6">Сцены и Автоматизация</h1>
+            <div id="scenesContent">
+                <!-- Предустановленные сцены -->
+                <div class="mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Сцены</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <button onclick="executeScene('home')" 
+                                class="bg-gray-800 hover:bg-gray-700 rounded-2xl p-6 text-left transition-colors">
+                            <h3 class="text-xl font-semibold mb-2">Я дома</h3>
+                            <p class="text-sm text-gray-400">Включить свет, Wi-Fi розетку ПК, обогреватель</p>
+                        </button>
+                        <button onclick="executeScene('night')" 
+                                class="bg-gray-800 hover:bg-gray-700 rounded-2xl p-6 text-left transition-colors">
+                            <h3 class="text-xl font-semibold mb-2">Ночь</h3>
+                            <p class="text-sm text-gray-400">Выключить всё, включить подсветку</p>
+                        </button>
+                        <button onclick="executeScene('wake')" 
+                                class="bg-gray-800 hover:bg-gray-700 rounded-2xl p-6 text-left transition-colors">
+                            <h3 class="text-xl font-semibold mb-2">Проснуться</h3>
+                            <p class="text-sm text-gray-400">Плавно включить свет, поставить музыку</p>
+                        </button>
+                        <button onclick="executeScene('away')" 
+                                class="bg-gray-800 hover:bg-gray-700 rounded-2xl p-6 text-left transition-colors">
+                            <h3 class="text-xl font-semibold mb-2">Ушел</h3>
+                            <p class="text-sm text-gray-400">Отключить розетки, закрыть шторы</p>
+                        </button>
+                    </div>
+                    <button onclick="showCreateSceneModal()" 
+                            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Создать сцену
+                    </button>
+                </div>
+                
+                <!-- Расписания -->
+                <div class="mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Расписания</h2>
+                    <div id="schedulesList" class="space-y-3 mb-4">
+                        <p class="text-gray-400">Нет расписаний</p>
+                    </div>
+                    <button onclick="showCreateScheduleModal()" 
+                            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Создать расписание
+                    </button>
+                </div>
+                
+                <!-- Автоматизация -->
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4">Автоматизация</h2>
+                    <div id="automationsList" class="space-y-3 mb-4">
+                        <p class="text-gray-400">Нет автоматизаций</p>
+                    </div>
+                    <button onclick="showCreateAutomationModal()" 
+                            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Создать автоматизацию
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Раздел: Настройки -->
+        <div id="section-settings" class="section-content hidden">
+            <h1 class="text-4xl font-bold mb-6">Настройки</h1>
+            <div id="settingsContent">
+                <!-- Голосовое управление -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Голосовое управление</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-lg">Включить прослушивание</span>
+                        <label class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="voiceControlToggle" 
+                                   onchange="toggleVoiceControl(this.checked)"
+                                   class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all"/>
+                            <label for="voiceControlToggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Период работы (с утра до ночи)</label>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-400 mb-1">Начало</label>
+                                <input type="time" id="voiceControlStart" value="07:00"
+                                       class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-400 mb-1">Конец</label>
+                                <input type="time" id="voiceControlEnd" value="23:00"
+                                       class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold mb-2">Команды</h3>
+                        <div id="voiceCommandsList" class="space-y-2 mb-4">
+                            <!-- Будет добавлено динамически -->
+                        </div>
+                        <button onclick="showAddVoiceCommandModal()" 
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors">
+                            Добавить команду
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Музыкальный плеер -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Музыкальный плеер</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Выберите сервис</label>
+                        <select id="musicServiceSelect" onchange="changeMusicService(this.value)"
+                                class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                            <option value="spotify">Spotify</option>
+                            <option value="youtube">YouTube Music</option>
+                        </select>
+                    </div>
+                    <div id="musicPlayerContainer" class="mt-4">
+                        <!-- Плеер будет добавлен динамически -->
+                    </div>
+                </div>
+                <!-- Системная информация -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Системная информация</h2>
+                    <div id="systemInfo" class="space-y-2">
+                        <p class="text-gray-400">Загрузка информации...</p>
+                    </div>
+                </div>
+                
+                <!-- Настройки уведомлений -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Уведомления</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-lg">Звуковые уведомления</span>
+                        <label class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="soundNotificationsToggle" 
+                                   onchange="toggleSoundNotifications(this.checked)"
+                                   class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all"/>
+                            <label for="soundNotificationsToggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Калибровка датчиков -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Калибровка датчиков</h2>
+                    <div id="sensorCalibration" class="space-y-4">
+                        <p class="text-gray-400">Выберите датчик для калибровки</p>
+                    </div>
+                </div>
+                
+                <!-- Режим сна экрана -->
+                <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4">Режим сна экрана</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-lg">Гаснуть при бездействии</span>
+                        <label class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="screenSleepToggle" 
+                                   onchange="toggleScreenSleep(this.checked)"
+                                   class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 border-gray-600 appearance-none cursor-pointer transition-all"/>
+                            <label for="screenSleepToggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                        </label>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm text-gray-400 mb-2">Время бездействия (минуты)</label>
+                        <input type="number" id="screenSleepTime" min="1" max="60" value="10"
+                               class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                    </div>
+                </div>
+                
+                <!-- Настройки API -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h2 class="text-2xl font-semibold mb-4">Настройки API</h2>
+                    <p class="text-sm text-gray-400 mb-4">Настройки API хранятся на сервере в файле server.js</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">SmartThings API Token</label>
+                            <input type="text" value="***" disabled
+                                   class="w-full px-4 py-2 bg-gray-700 rounded-lg opacity-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">OpenWeatherMap API Key</label>
+                            <input type="text" value="***" disabled
+                                   class="w-full px-4 py-2 bg-gray-700 rounded-lg opacity-50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для расширенного управления устройством -->
+    <div id="deviceControlModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modalDeviceName" class="text-2xl font-bold">Управление устройством</h2>
+                <button onclick="closeDeviceControlModal()" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="modalDeviceContent">
+                <!-- Контент будет добавлен динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания сцены -->
+    <div id="createSceneModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Создать сцену</h2>
+                <button onclick="closeModal('createSceneModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Название сцены</label>
+                    <input type="text" id="sceneNameInput" placeholder="Например: Утро" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Выберите устройства</label>
+                    <div id="sceneDevicesList" class="space-y-2 max-h-64 overflow-y-auto">
+                        <!-- Будет добавлено динамически -->
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveScene()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Создать
+                    </button>
+                    <button onclick="closeModal('createSceneModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания расписания -->
+    <div id="createScheduleModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Создать расписание</h2>
+                <button onclick="closeModal('createScheduleModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Название расписания</label>
+                    <input type="text" id="scheduleNameInput" placeholder="Например: Выключить свет на ночь" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Время</label>
+                    <input type="time" id="scheduleTimeInput" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Дни недели</label>
+                    <div id="scheduleDaysList" class="grid grid-cols-7 gap-2">
+                        <!-- Будет добавлено динамически -->
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Устройство</label>
+                    <select id="scheduleDeviceSelect" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <!-- Будет добавлено динамически -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Действие</label>
+                    <select id="scheduleActionSelect" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <option value="on">Включить</option>
+                        <option value="off">Выключить</option>
+                    </select>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveSchedule()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Создать
+                    </button>
+                    <button onclick="closeModal('createScheduleModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания автоматизации -->
+    <div id="createAutomationModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Создать автоматизацию</h2>
+                <button onclick="closeModal('createAutomationModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Название автоматизации</label>
+                    <input type="text" id="automationNameInput" placeholder="Например: Автоматическое освещение" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Условие (Если)</label>
+                    <select id="automationConditionType" onchange="updateAutomationConditionUI()" 
+                            class="w-full px-4 py-2 bg-gray-700 rounded-lg mb-2">
+                        <option value="time">Время</option>
+                        <option value="device">Состояние устройства</option>
+                        <option value="sensor">Датчик</option>
+                    </select>
+                    <div id="automationConditionContent" class="space-y-2">
+                        <!-- Будет добавлено динамически -->
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Действие (То)</label>
+                    <select id="automationActionDeviceSelect" class="w-full px-4 py-2 bg-gray-700 rounded-lg mb-2">
+                        <!-- Будет добавлено динамически -->
+                    </select>
+                    <select id="automationActionSelect" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <option value="on">Включить</option>
+                        <option value="off">Выключить</option>
+                    </select>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveAutomation()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Создать
+                    </button>
+                    <button onclick="closeModal('createAutomationModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для настройки устройства в безопасности -->
+    <div id="securityDeviceSettingsModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Настройки устройства</h2>
+                <button onclick="closeModal('securityDeviceSettingsModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Пользовательское имя</label>
+                    <input type="text" id="securityDeviceNameInput" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="securityDeviceHiddenCheckbox" class="mr-2">
+                        <span class="text-sm">Скрыть устройство полностью (не использовать)</span>
+                    </label>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveSecurityDeviceSettings()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Сохранить
+                    </button>
+                    <button onclick="closeModal('securityDeviceSettingsModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно управления PTZ камеры -->
+    <div id="cameraControlModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Управление PTZ</h2>
+                <button onclick="closeModal('cameraControlModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <!-- Панорамирование -->
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Панорамирование (Pan)</label>
+                    <div class="flex gap-2">
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'pan', -10)" 
+                                class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            ← Влево
+                        </button>
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'pan', 0)" 
+                                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            Центр
+                        </button>
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'pan', 10)" 
+                                class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            Вправо →
+                        </button>
+                    </div>
+                </div>
+                <!-- Наклон -->
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Наклон (Tilt)</label>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'tilt', 10)" 
+                                class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            ↑ Вверх
+                        </button>
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'tilt', 0)" 
+                                class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            Центр
+                        </button>
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'tilt', -10)" 
+                                class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            ↓ Вниз
+                        </button>
+                    </div>
+                </div>
+                <!-- Зум -->
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Зум (Zoom)</label>
+                    <div class="flex gap-2">
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'zoom', -0.1)" 
+                                class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            ➖ Уменьшить
+                        </button>
+                        <button onclick="controlCameraPTZ(document.getElementById('cameraControlModal').getAttribute('data-camera-id'), 'zoom', 0.1)" 
+                                class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                            ➕ Увеличить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек камеры -->
+    <div id="cameraSettingsModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Настройки камеры</h2>
+                <button onclick="closeModal('cameraSettingsModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Название камеры</label>
+                    <input type="text" id="cameraNameInput" placeholder="IP Камера" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">URL видеопотока</label>
+                    <input type="text" id="cameraStreamUrlInput" placeholder="rtsp://..." 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveCameraSettings()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Сохранить
+                    </button>
+                    <button onclick="closeModal('cameraSettingsModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно управления дверным звонком -->
+    <div id="doorbellControlModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Управление дверным звонком</h2>
+                <button onclick="closeModal('doorbellControlModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Микрофон</label>
+                    <div class="flex gap-2">
+                        <button onclick="toggleDoorbellMicrophone(true)" 
+                                class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
+                            Включить
+                        </button>
+                        <button onclick="toggleDoorbellMicrophone(false)" 
+                                class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                            Выключить
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Динамик</label>
+                    <div class="flex gap-2">
+                        <button onclick="toggleDoorbellSpeaker(true)" 
+                                class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
+                            Включить
+                        </button>
+                        <button onclick="toggleDoorbellSpeaker(false)" 
+                                class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                            Выключить
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Громкость</label>
+                    <input type="range" id="doorbellVolumeSlider" min="0" max="100" value="50" 
+                           class="w-full" onchange="setDoorbellVolume(this.value)">
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>0%</span>
+                        <span id="doorbellVolumeValue">50%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек дверного звонка -->
+    <div id="doorbellSettingsModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Настройки дверного звонка</h2>
+                <button onclick="closeModal('doorbellSettingsModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Название</label>
+                    <input type="text" id="doorbellNameInput" placeholder="Дверной звонок" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">URL видеопотока</label>
+                    <input type="text" id="doorbellStreamUrlInput" placeholder="rtsp://..." 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveDoorbellSettings()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Сохранить
+                    </button>
+                    <button onclick="closeModal('doorbellSettingsModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек датчика дыма -->
+    <div id="smokeDetectorSettingsModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Настройки датчика дыма</h2>
+                <button onclick="closeModal('smokeDetectorSettingsModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Чувствительность</label>
+                    <input type="range" id="smokeDetectorSensitivitySlider" min="1" max="10" value="5" 
+                           class="w-full" onchange="setSmokeDetectorSensitivity(this.value)">
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>Низкая</span>
+                        <span id="smokeDetectorSensitivityValue">5</span>
+                        <span>Высокая</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="smokeDetectorNotificationsCheckbox" class="mr-2">
+                        <span class="text-sm">Уведомления при обнаружении дыма</span>
+                    </label>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveSmokeDetectorSettings()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Сохранить
+                    </button>
+                    <button onclick="closeModal('smokeDetectorSettingsModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно полноэкранного просмотра камеры -->
+    <div id="cameraFullscreenModal" class="fixed inset-0 bg-black z-50 hidden flex items-center justify-center">
+        <div class="w-full h-full flex flex-col">
+            <div class="flex justify-between items-center p-4 bg-gray-900 bg-opacity-75">
+                <h2 class="text-xl font-bold">Просмотр камеры</h2>
+                <button onclick="closeModal('cameraFullscreenModal')" class="text-white hover:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+                <img id="cameraFullscreenImage" src="" alt="Камера" class="max-w-full max-h-full object-contain">
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления голосовой команды -->
+    <div id="addVoiceCommandModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Добавить голосовую команду</h2>
+                <button onclick="closeModal('addVoiceCommandModal')" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Текст команды</label>
+                    <input type="text" id="voiceCommandTextInput" placeholder="Например: включи лампочку" 
+                           class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Устройство</label>
+                    <select id="voiceCommandDeviceSelect" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <!-- Будет добавлено динамически -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Действие</label>
+                    <select id="voiceCommandActionSelect" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <option value="on">Включить</option>
+                        <option value="off">Выключить</option>
+                    </select>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveVoiceCommand()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                        Добавить
+                    </button>
+                    <button onclick="closeModal('addVoiceCommandModal')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript модули -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

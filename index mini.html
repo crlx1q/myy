@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mini Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            font-size: 14px;
+        }
+        
+        /* Статус бар */
+        .status-bar {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            z-index: 1000;
+        }
+        
+        .status-item {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #222;
+        }
+        
+        .status-item.online {
+            color: #0f0;
+        }
+        
+        .status-item.offline {
+            color: #f00;
+        }
+        
+        /* Полноэкранное уведомление о подключении */
+        .connection-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(200, 0, 0, 0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .connection-overlay.visible {
+            display: block;
+        }
+        
+        .connection-overlay-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -50px;
+            margin-left: -150px;
+            width: 300px;
+            padding: 20px;
+        }
+        
+        .connection-overlay-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        /* Страницы */
+        .page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Страница часов - главная */
+        #page-clock {
+            padding: 10px;
+        }
+        
+        .weather-top {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .weather-top-side {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        .weather-top-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 3px;
+        }
+        
+        .weather-top-temp {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .weather-top-humidity {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .clock-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            margin-top: -80px;
+            margin-left: -50%;
+            text-align: center;
+        }
+        
+        .clock-time {
+            font-size: 120px;
+            font-weight: bold;
+            line-height: 1;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .clock-date {
+            font-size: 18px;
+            color: #888;
+            text-align: center;
+        }
+        
+        /* Свайп подсказка */
+        .swipe-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+        }
+        
+        /* Страница прогноза (свайп вправо) */
+        #page-forecast {
+            padding: 15px 10px;
+            overflow-y: auto;
+        }
+        
+        .forecast-title {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+        
+        .forecast-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            padding: 10px 5px;
+            margin-bottom: 20px;
+        }
+        
+        .forecast-item {
+            display: inline-block;
+            text-align: center;
+            padding: 20px 25px;
+            margin: 0 8px;
+            background: #111;
+            border-radius: 8px;
+            min-width: 110px;
+        }
+        
+        .forecast-time {
+            font-size: 16px;
+            color: #888;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .forecast-temp {
+            font-size: 36px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .forecast-desc {
+            font-size: 12px;
+            color: #666;
+            display: block;
+        }
+        
+        .weather-compare {
+            display: table;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .weather-side {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            padding: 10px;
+            vertical-align: top;
+        }
+        
+        .weather-side-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .weather-side-temp {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .weather-side-humidity {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Страница устройств */
+        #page-devices {
+            padding: 15px 10px 60px 10px;
+            overflow-y: auto;
+        }
+        
+        #page-devices h2 {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .devices-grid {
+            display: table;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px;
+        }
+        
+        .devices-row {
+            display: table-row;
+        }
+        
+        .device {
+            display: table-cell;
+            width: 50%;
+            background: #111;
+            border: 2px solid #333;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            vertical-align: middle;
+            min-height: 100px;
+        }
+        
+        .device.on {
+            background: #2a2a1a;
+            border-color: #ff0;
+        }
+        
+        .device-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: bold;
+        }
+        
+        .device.on .device-icon {
+            color: #ff0;
+        }
+        
+        .device-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .device-status {
+            font-size: 12px;
+            color: #888;
+            display: block;
+        }
+        
+        .device.on .device-status {
+            color: #ff0;
+        }
+        
+        .no-devices {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+        }
+        
+        /* Кнопка назад */
+        .back-btn {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            margin-left: -50px;
+            width: 100px;
+            padding: 10px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .back-btn:active {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Статус бар -->
+    <div class="status-bar">
+        <span id="status-server" class="status-item offline">Сервер</span>
+    </div>
+    
+    <!-- Полноэкранное уведомление о подключении -->
+    <div id="connection-overlay" class="connection-overlay">
+        <div class="connection-overlay-content">
+            <div class="connection-overlay-text">Нет подключения к серверу</div>
+        </div>
+    </div>
+    
+    <!-- Страница часов и погоды (главная) -->
+    <div class="page active" id="page-clock">
+        <!-- Погода сверху: снаружи и дома -->
+        <div class="weather-top">
+            <div class="weather-top-side">
+                <div class="weather-top-label">Снаружи</div>
+                <div class="weather-top-temp" id="top-outside-temp">--°C</div>
+                <div class="weather-top-humidity" id="top-outside-humidity">--%</div>
+            </div>
+            <div class="weather-top-side">
+                <div class="weather-top-label">Дома</div>
+                <div class="weather-top-temp" id="top-inside-temp">--°C</div>
+                <div class="weather-top-humidity" id="top-inside-humidity">--%</div>
+            </div>
+        </div>
+        
+        <!-- Часы -->
+        <div class="clock-container">
+            <div class="clock-time" id="clock-time">00:00</div>
+            <div class="clock-date" id="clock-date">загрузка...</div>
+        </div>
+        
+        <div class="swipe-hint">Свайп вправо → прогноз | Свайп влево → устройства</div>
+    </div>
+    
+    <!-- Страница прогноза (свайп вправо) -->
+    <div class="page" id="page-forecast">
+        <div class="forecast-title">Прогноз по часам</div>
+        <div class="forecast-container" id="forecast-container">
+            <!-- Прогноз будет добавлен сюда -->
+        </div>
+        
+        <button class="back-btn" onclick="showPage(0)">Назад</button>
+    </div>
+    
+    <!-- Страница устройств (свайп влево) -->
+    <div class="page" id="page-devices">
+        <h2>Устройства</h2>
+        <div id="devices-list">
+            <div class="no-devices">Загрузка...</div>
+        </div>
+        <button class="back-btn" onclick="showPage(0)">Назад</button>
+    </div>
+
+<script>
+// Глобальные переменные (var для Android 4)
+var currentPage = 0;
+var devices = [];
+var deviceStates = {};
+var weatherData = null;
+var forecastData = null;
+var insideTemp = null;
+var insideHumidity = null;
+var isOnline = false;
+var pollInterval = null;
+var errorCount = 0;
+
+// Получить элемент по ID
+function $(id) {
+    return document.getElementById(id);
+}
+
+// Добавить ноль перед числом
+function pad(n) {
+    return n < 10 ? '0' + n : '' + n;
+}
+
+// Обновить часы
+function updateClock() {
+    var d = new Date();
+    var h = pad(d.getHours());
+    var m = pad(d.getMinutes());
+    $('clock-time').innerHTML = h + ':' + m;
+    
+    var days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+    var months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    var dateStr = days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+    $('clock-date').innerHTML = dateStr;
+}
+
+// Показать страницу
+function showPage(n) {
+    $('page-clock').className = 'page' + (n === 0 ? ' active' : '');
+    $('page-forecast').className = 'page' + (n === 2 ? ' active' : '');
+    $('page-devices').className = 'page' + (n === 1 ? ' active' : '');
+    currentPage = n;
+}
+
+// Найти температуру внутри дома из устройств
+function findInsideTemperature() {
+    insideTemp = null;
+    insideHumidity = null;
+    
+    for (var i = 0; i < devices.length; i++) {
+        var dev = devices[i];
+        if (!dev || !dev.deviceId) continue;
+        
+        var status = deviceStates[dev.deviceId];
+        if (!status || !status.main) continue;
+        
+        // Ищем температуру
+        if (status.main.temperatureMeasurement && status.main.temperatureMeasurement.temperature) {
+            var temp = status.main.temperatureMeasurement.temperature.value;
+            var unit = status.main.temperatureMeasurement.temperature.unit || 'C';
+            insideTemp = Math.round(temp) + '°' + unit;
+            
+            // Ищем влажность
+            if (status.main.relativeHumidityMeasurement && status.main.relativeHumidityMeasurement.humidity) {
+                insideHumidity = Math.round(status.main.relativeHumidityMeasurement.humidity.value) + '%';
+            }
+            
+            return; // Нашли первое устройство с температурой
+        }
+    }
+}
+
+// Обновить погоду на главном экране
+function updateWeather() {
+    // Верхняя часть - снаружи
+    if (weatherData) {
+        $('top-outside-temp').innerHTML = weatherData.temp + '°C';
+        $('top-outside-humidity').innerHTML = (weatherData.humidity || '--') + '%';
+    } else {
+        $('top-outside-temp').innerHTML = '--°C';
+        $('top-outside-humidity').innerHTML = '--%';
+    }
+    
+    // Верхняя часть - дома
+    findInsideTemperature();
+    if (insideTemp) {
+        $('top-inside-temp').innerHTML = insideTemp;
+    } else {
+        $('top-inside-temp').innerHTML = '--°C';
+    }
+    if (insideHumidity) {
+        $('top-inside-humidity').innerHTML = insideHumidity;
+    } else {
+        $('top-inside-humidity').innerHTML = '--%';
+    }
+}
+
+// Обновить прогноз
+function updateForecast() {
+    // Обновляем прогноз по часам
+    var container = $('forecast-container');
+    
+    if (!forecastData || forecastData.length === 0) {
+        container.innerHTML = '<div class="forecast-item"><span class="forecast-temp">нет данных</span></div>';
+        return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < forecastData.length; i++) {
+        var item = forecastData[i];
+        var time = item.time || '--:--';
+        var temp = item.temp !== undefined ? item.temp + '°' : '--°';
+        var desc = item.description || '';
+        
+        html += '<div class="forecast-item">';
+        html += '<span class="forecast-time">' + time + '</span>';
+        html += '<span class="forecast-temp">' + temp + '</span>';
+        if (desc) {
+            html += '<span class="forecast-desc">' + desc + '</span>';
+        }
+        html += '</div>';
+    }
+    
+    container.innerHTML = html;
+}
+
+// Получить иконку устройства (простые символы)
+function getDeviceIcon(device, status) {
+    var label = (device.label || '').toLowerCase();
+    
+    // По типу устройства
+    if (status && status.main) {
+        if (status.main.switch) return '*';
+        if (status.main.temperatureMeasurement) return 'T';
+        if (status.main.contactSensor) return 'D';
+        if (status.main.motionSensor) return 'M';
+        if (status.main.powerMeter) return 'P';
+    }
+    
+    // По названию
+    if (label.indexOf('лам') >= 0 || label.indexOf('свет') >= 0 || label.indexOf('light') >= 0) return '*';
+    if (label.indexOf('розет') >= 0 || label.indexOf('outlet') >= 0) return 'O';
+    if (label.indexOf('датчик') >= 0 || label.indexOf('sensor') >= 0) return 'S';
+    if (label.indexOf('температур') >= 0 || label.indexOf('temp') >= 0) return 'T';
+    if (label.indexOf('движен') >= 0 || label.indexOf('motion') >= 0) return 'M';
+    if (label.indexOf('контакт') >= 0 || label.indexOf('contact') >= 0) return 'D';
+    
+    return '?';
+}
+
+// Отрисовать устройства
+function renderDevices() {
+    var list = $('devices-list');
+    
+    if (!devices || devices.length === 0) {
+        list.innerHTML = '<div class="no-devices">Нет устройств</div>';
+        return;
+    }
+    
+    var html = '<div class="devices-grid">';
+    var rowOpen = false;
+    
+    for (var i = 0; i < devices.length; i++) {
+        var dev = devices[i];
+        if (!dev || !dev.deviceId) continue;
+        
+        var id = dev.deviceId;
+        var status = deviceStates[id];
+        var isOn = false;
+        var stateText = 'Выкл';
+        var canToggle = false;
+        
+        if (status && status.main) {
+            // Проверяем switch
+            if (status.main.switch && status.main.switch.switch) {
+                if (status.main.switch.switch.value === 'on') {
+                    isOn = true;
+                    stateText = 'Вкл';
+                }
+                canToggle = true;
+            }
+            // Проверяем контактный датчик
+            else if (status.main.contactSensor && status.main.contactSensor.contact) {
+                stateText = status.main.contactSensor.contact.value === 'open' ? 'Открыто' : 'Закрыто';
+            }
+            // Проверяем температуру
+            else if (status.main.temperatureMeasurement && status.main.temperatureMeasurement.temperature) {
+                stateText = status.main.temperatureMeasurement.temperature.value + '°C';
+            }
+            // Проверяем движение
+            else if (status.main.motionSensor && status.main.motionSensor.motion) {
+                stateText = status.main.motionSensor.motion.value === 'active' ? 'Движение' : 'Нет движения';
+            }
+        }
+        
+        // Начинаем новую строку каждые 2 устройства
+        if (i % 2 === 0) {
+            if (rowOpen) html += '</div>';
+            html += '<div class="devices-row">';
+            rowOpen = true;
+        }
+        
+        var divClass = 'device' + (isOn ? ' on' : '');
+        var label = dev.label || 'Устройство';
+        var icon = getDeviceIcon(dev, status);
+        
+        html += '<div class="' + divClass + '" data-id="' + id + '" data-toggle="' + (canToggle ? '1' : '0') + '" data-on="' + (isOn ? '1' : '0') + '">';
+        html += '<span class="device-icon">' + icon + '</span>';
+        html += '<span class="device-name">' + label + '</span>';
+        html += '<span class="device-status">' + stateText + '</span>';
+        html += '</div>';
+        
+        // Закрываем строку после второго устройства
+        if (i % 2 === 1 || i === devices.length - 1) {
+            html += '</div>';
+            rowOpen = false;
+        }
+    }
+    
+    html += '</div>';
+    list.innerHTML = html;
+    
+    // Добавляем обработчики кликов
+    var divs = list.getElementsByClassName('device');
+    for (var j = 0; j < divs.length; j++) {
+        divs[j].onclick = function() {
+            var el = this;
+            if (el.getAttribute('data-toggle') !== '1') return;
+            
+            var deviceId = el.getAttribute('data-id');
+            var isCurrentlyOn = el.getAttribute('data-on') === '1';
+            var cmd = isCurrentlyOn ? 'off' : 'on';
+            
+            controlDevice(deviceId, cmd);
+        };
+    }
+}
+
+// Управление устройством через GET запрос
+function controlDevice(deviceId, command) {
+    var xhr = new XMLHttpRequest();
+    var url = '/api/mini/control?deviceId=' + encodeURIComponent(deviceId) + '&command=' + encodeURIComponent(command) + '&capability=switch';
+    
+    xhr.open('GET', url, true);
+    xhr.timeout = 10000;
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Обновляем данные
+                setTimeout(fetchData, 500);
+            } else {
+                showConnectionError();
+            }
+        }
+    };
+    
+    xhr.onerror = function() {
+        showConnectionError();
+    };
+    
+    xhr.send(null);
+}
+
+// Получить данные с сервера
+function fetchData() {
+    var xhr = new XMLHttpRequest();
+    var url = '/api/mini/data?_=' + new Date().getTime();
+    
+    xhr.open('GET', url, true);
+    xhr.timeout = 15000;
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    
+                    // Обновляем данные
+                    if (data.devices) {
+                        devices = data.devices;
+                    }
+                    if (data.deviceStates) {
+                        deviceStates = data.deviceStates;
+                    }
+                    if (data.weather) {
+                        weatherData = data.weather;
+                    }
+                    if (data.forecast) {
+                        forecastData = data.forecast;
+                    }
+                    
+                    // Отмечаем что онлайн
+                    setOnline(true);
+                    errorCount = 0;
+                    
+                    // Обновляем UI
+                    updateWeather();
+                    updateForecast();
+                    renderDevices();
+                    
+                } catch (e) {
+                    setOnline(false);
+                    errorCount++;
+                    if (errorCount > 3) {
+                        showConnectionError();
+                    }
+                }
+            } else {
+                setOnline(false);
+                errorCount++;
+                if (errorCount > 3) {
+                    showConnectionError();
+                }
+            }
+        }
+    };
+    
+    xhr.onerror = function() {
+        setOnline(false);
+        errorCount++;
+        if (errorCount > 5) {
+            showConnectionError();
+        }
+    };
+    
+    xhr.ontimeout = function() {
+        setOnline(false);
+        errorCount++;
+        if (errorCount > 3) {
+            showConnectionError();
+        }
+    };
+    
+    xhr.send(null);
+}
+
+// Установить статус онлайн/офлайн
+function setOnline(online) {
+    isOnline = online;
+    var el = $('status-server');
+    var overlay = $('connection-overlay');
+    
+    if (online) {
+        el.innerHTML = 'Онлайн';
+        el.className = 'status-item online';
+        overlay.className = 'connection-overlay';
+    } else {
+        el.innerHTML = 'Офлайн';
+        el.className = 'status-item offline';
+    }
+}
+
+// Показать полноэкранное уведомление о подключении
+function showConnectionError() {
+    var overlay = $('connection-overlay');
+    overlay.className = 'connection-overlay visible';
+}
+
+// Обработка свайпов (горизонтальные)
+var touchStartY = 0;
+var touchStartX = 0;
+var touchStartElement = null;
+
+document.addEventListener('touchstart', function(e) {
+    if (e.touches && e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        touchStartElement = e.target;
+    }
+}, false);
+
+document.addEventListener('touchend', function(e) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
+        var endY = e.changedTouches[0].clientY;
+        var endX = e.changedTouches[0].clientX;
+        var dy = endY - touchStartY;
+        var dx = endX - touchStartX;
+        
+        // Проверяем, не происходит ли свайп внутри контейнера прогноза
+        var forecastContainer = $('forecast-container');
+        var isInsideForecast = false;
+        var el = touchStartElement;
+        while (el && el !== document.body) {
+            if (el === forecastContainer) {
+                isInsideForecast = true;
+                break;
+            }
+            el = el.parentNode;
+        }
+        
+        // Горизонтальный свайп (только если не внутри контейнера прогноза)
+        if (!isInsideForecast && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+            if (dx > 0 && currentPage === 0) {
+                // Свайп вправо на главной -> прогноз
+                showPage(2);
+            } else if (dx < 0 && currentPage === 0) {
+                // Свайп влево на главной -> устройства
+                showPage(1);
+            } else if (dx < 0 && currentPage === 2) {
+                // Свайп влево на прогнозе -> главная
+                showPage(0);
+            } else if (dx > 0 && currentPage === 1) {
+                // Свайп вправо на устройствах -> главная
+                showPage(0);
+            }
+        }
+    }
+}, false);
+
+// Запуск
+function init() {
+    // Обновляем часы
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Начальный статус
+    setOnline(false);
+    showConnectionError();
+    
+    // Первый запрос данных
+    fetchData();
+    
+    // Polling каждые 5 секунд
+    pollInterval = setInterval(fetchData, 5000);
+}
+
+// Запускаем после загрузки
+if (document.readyState === 'complete') {
+    init();
+} else {
+    window.onload = init;
+}
+</script>
+</body>
+</html>
