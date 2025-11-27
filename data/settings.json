@@ -1,0 +1,13 @@
+{
+  "awayMode": false,
+  "presenceDevices": [],
+  "soundNotifications": true,
+  "voiceControlEnabled": true,
+  "voiceControlStart": "07:00",
+  "voiceControlEnd": "23:59",
+  "microphoneSensitivity": 5,
+  "selectedResidents": [],
+  "musicService": "spotify",
+  "screenSleep": true,
+  "screenSleepTime": 1
+}

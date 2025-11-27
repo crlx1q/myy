@@ -1,0 +1,4301 @@
+{
+  "events": [
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T09:54:11.895Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T09:54:11.898Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "056dae62-1c79-4d9c-a885-3a342e8841d9",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T09:55:24.116Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3af8d6b9-98d9-424c-8ed4-4b667606212e",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T09:55:24.122Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "50ed43fd-e63e-4ae1-a6cf-2beab984a062",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T09:55:24.142Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T09:58:24.093Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.422Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.682Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.688Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.695Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.700Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.703Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.715Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.718Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T09:58:29.764Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T09:59:11.316Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T09:59:11.317Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:00:07.906Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:00:28.247Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:01:11.718Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:01:16.969Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:01:32.579Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:01:38.895Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:01:50.986Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:02:36.506Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:02:40.148Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:02:44.940Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T10:04:11.813Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T10:04:11.815Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:06:36.022Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:06:50.608Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T10:25:02.592Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T10:25:02.596Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:28.595Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.403Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "50ed43fd-e63e-4ae1-a6cf-2beab984a062",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.639Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "056dae62-1c79-4d9c-a885-3a342e8841d9",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.678Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.682Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3af8d6b9-98d9-424c-8ed4-4b667606212e",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.684Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.713Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:34.716Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3af8d6b9-98d9-424c-8ed4-4b667606212e",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:41.926Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "056dae62-1c79-4d9c-a885-3a342e8841d9",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:41.937Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "50ed43fd-e63e-4ae1-a6cf-2beab984a062",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:26:41.977Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:29:41.779Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:29:43.786Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.166Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.199Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.414Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.424Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.440Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.445Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.455Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.548Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.935Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:29:47.994Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T10:30:02.610Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T10:30:02.614Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T10:42:22.253Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T10:42:22.257Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T10:47:21.680Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T10:47:21.684Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T10:51:34.403Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T10:51:34.407Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:53:10.714Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:12.900Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.191Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.203Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.266Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.293Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.303Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.319Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.332Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T10:53:13.337Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:53:58.856Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T10:54:02.920Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:02:40.258Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:02:40.260Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:09:32.329Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:09:32.333Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:11:31.420Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:11:31.424Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:41:10.840Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:41:10.843Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T11:42:31.969Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.324Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.523Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.528Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.533Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.540Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.547Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.612Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.647Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:42:33.660Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:45:59.452Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:45:59.458Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T11:46:45.850Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T11:46:51.254Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:46:55.686Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-10T11:46:58.938Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T11:47:29.484Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T11:47:34.869Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:52:24.016Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:52:24.019Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setColor",
+      "capability": "colorControl",
+      "timestamp": "2025-11-10T11:52:51.264Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setColor",
+      "capability": "colorControl",
+      "timestamp": "2025-11-10T11:52:56.538Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T11:56:35.308Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T11:56:35.310Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:00:34.255Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:00:34.258Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:11:54.146Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:11:54.152Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:13:23.990Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:13:23.993Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:16:37.798Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:16:37.800Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:17:23.130Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:18:58.418Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:18:58.425Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:19:39.796Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:19:50.741Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:21:20.955Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:21:27.787Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:23:58.752Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:23:58.753Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:31:39.639Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:31:39.641Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:32:58.577Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:32:58.582Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:41:46.820Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:41:46.822Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:42:17.180Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:42:24.290Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:43:41.137Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:44:05.910Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:49:34.937Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:49:34.940Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:50:12.137Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:50:19.146Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:52:37.792Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:52:37.794Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:52:43.710Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:52:50.427Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:52:58.230Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T12:56:32.421Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T12:56:32.424Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:56:55.646Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:57:07.543Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:57:39.989Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:57:46.597Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:58:09.090Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:58:18.595Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T12:59:26.898Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:00:04.748Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:00:21.616Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:00:28.302Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:00:50.853Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:00:55.903Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:01:03.973Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T13:01:32.861Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T13:01:32.863Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:01:35.088Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:02:15.594Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:02:19.754Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:03:30.202Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:03:58.392Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:04:02.246Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T13:13:14.919Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T13:13:14.922Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:25.603Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:26.596Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:32.074Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:32.888Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:32.968Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:33.113Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:33.193Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:34.027Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:38.868Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:39.167Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:39.178Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:39.247Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:39.474Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:39.649Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:40.338Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:54.030Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:13:54.673Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:09.259Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:10.348Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:13.865Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:14.364Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:14.746Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:25.178Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:14:26.200Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T13:16:18.075Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T13:16:18.078Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:16:34.964Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:16:47.456Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:16:55.549Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:16:59.161Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:17:57.128Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T13:18:04.665Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:08:17.717Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:08:17.719Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T15:08:58.031Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T15:09:06.412Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T15:09:16.637Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T15:09:22.581Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:13:11.717Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:13:11.719Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T15:13:21.870Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:19:30.071Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:19:30.075Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:27:42.961Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:27:42.965Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:31:03.839Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:31:03.842Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:33:15.253Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:33:15.256Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:36:09.288Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:36:09.290Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:39:00.481Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:39:00.483Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:40:36.256Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:40:36.264Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:48:25.512Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:48:25.514Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:53:25.552Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:53:25.557Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:55:47.973Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:55:47.976Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T15:56:48.253Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T15:56:48.257Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:02:06.762Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:02:06.764Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:03:35.307Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:03:47.712Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:03:57.263Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:11:06.470Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:11:06.473Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:11:41.139Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:11:48.342Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:11:54.263Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:16:06.849Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:16:06.852Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:21:06.356Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:21:06.358Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:26:06.031Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:26:06.034Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:31:06.440Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:31:06.443Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:34:42.048Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:34:46.190Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:36:06.431Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:36:06.435Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:41:06.932Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:41:06.934Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:46:06.101Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:46:06.104Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T16:51:06.232Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T16:51:06.235Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T16:55:41.827Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T17:03:52.873Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T17:03:52.876Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-10T17:05:39.962Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T17:11:04.672Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T17:11:04.675Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T17:16:43.138Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T17:16:43.144Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T17:20:27.456Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T17:20:27.459Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-10T17:24:22.739Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-10T17:24:22.742Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T04:13:40.105Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T04:13:40.111Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T04:22:59.929Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T04:22:59.933Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T04:23:19.008Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T04:23:19.016Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T04:24:55.316Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T04:24:55.319Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T04:58:56.940Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T04:58:56.944Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:02:51.445Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:02:51.450Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:13:58.094Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:13:58.101Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:18:43.153Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:18:43.158Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:22:49.523Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:22:49.532Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:32:11.874Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:32:11.885Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:49:59.602Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:49:59.608Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:53:08.788Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:53:08.795Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:56:10.708Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:56:10.716Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:57:18.155Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:57:18.163Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-11T05:57:57.710Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T05:59:33.943Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T05:59:33.952Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T06:03:06.287Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T06:03:06.300Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-11T06:03:09.818Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T06:09:06.741Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T06:09:06.753Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T06:09:50.525Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T06:09:50.532Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T06:14:58.786Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T06:14:58.796Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T14:47:25.981Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T14:47:25.986Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T14:54:53.614Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T14:54:53.621Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T14:57:51.974Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T14:57:51.984Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:00:02.730Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:00:02.734Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T15:04:01.136Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-11T15:04:31.021Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:05:00.390Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:05:00.393Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:17:30.758Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:17:30.762Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:18:15.411Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:18:15.415Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:22:35.069Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:22:35.075Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:27:33.578Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:27:33.581Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T15:40:02.247Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T15:40:02.251Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T16:38:14.199Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T16:38:14.203Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T16:45:46.279Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T16:45:46.284Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T16:47:33.776Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T16:47:33.782Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T16:51:33.950Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T16:51:33.957Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T16:57:52.832Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T16:57:52.835Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T16:59:37.138Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T16:59:37.144Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:06:43.836Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:06:43.840Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:06:55.905Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:06:57.782Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:07:03.817Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:07:07.599Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:07:08.593Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:07:12.757Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:19:06.535Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:19:06.538Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:19:18.096Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:19:21.241Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:19:25.491Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:19:32.526Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:19:40.684Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:19:45.513Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:19:53.809Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:20:50.131Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:20:50.138Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:24:39.022Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:24:39.029Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:24:50.297Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:24:57.098Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:25:00.515Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:25:05.887Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:25:11.481Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:25:18.840Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:32:21.056Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:32:21.060Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:32:22.214Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:32:22.870Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:32:51.868Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:33:11.730Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:33:18.099Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:33:24.330Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:33:29.388Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:33:35.237Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:33:43.510Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:33:46.959Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-11T17:33:49.180Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T17:33:54.019Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:34:04.735Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:34:04.738Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:45:11.152Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:45:11.162Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T17:46:54.735Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T17:46:54.739Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T18:30:17.240Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T18:30:17.248Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T18:31:59.998Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T18:32:00.005Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T18:36:00.545Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T18:36:00.550Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T18:54:57.678Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T18:54:57.685Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T18:55:43.883Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T18:55:46.827Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T18:55:47.110Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T18:55:56.120Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "setLevel",
+      "capability": "switchLevel",
+      "timestamp": "2025-11-11T18:56:00.154Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T18:56:41.273Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T18:56:41.278Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-11T18:57:48.091Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-11T18:57:48.095Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:04:23.228Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:04:23.232Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:06:06.761Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:06:06.768Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:09:47.986Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:09:47.991Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:11:34.938Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:11:34.945Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:14:07.578Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:14:07.585Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:15:55.067Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:15:55.073Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:19:55.140Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:19:55.145Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:21:39.100Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:21:39.105Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:24:02.277Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:24:02.282Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:32:39.404Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:32:39.414Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:33:26.528Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:33:26.538Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:35:13.780Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:35:13.787Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:39:13.859Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:39:13.863Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:41:29.394Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:41:32.366Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:41:33.277Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:41:48.383Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:42:08.350Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:42:16.909Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:42:26.899Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:42:28.413Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:42:39.625Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:43:17.331Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:43:17.335Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:44:41.911Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:44:41.918Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:45:34.149Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:45:59.902Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T14:46:06.671Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:46:27.623Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:46:27.628Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T14:50:27.836Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T14:50:27.841Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:02:24.047Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:02:24.055Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:03:23.578Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:04:00.060Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:04:05.683Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:04:07.645Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:04:07.651Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "50ed43fd-e63e-4ae1-a6cf-2beab984a062",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:04:10.834Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "50ed43fd-e63e-4ae1-a6cf-2beab984a062",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:04:16.224Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:11:49.132Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:11:49.138Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:13:36.579Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:13:36.583Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "off",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:14:04.422Z"
+    },
+    {
+      "type": "device-control",
+      "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+      "command": "on",
+      "capability": "switch",
+      "timestamp": "2025-11-26T15:14:10.066Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:19:14.388Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:19:14.396Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:26:13.838Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:26:13.847Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:28:01.780Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:28:01.787Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:29:01.108Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:29:01.116Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:30:15.895Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:30:15.904Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:30:46.778Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:30:46.784Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:32:03.598Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:32:03.609Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:33:34.865Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:33:34.873Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:35:21.328Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:35:21.333Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:37:08.428Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:37:08.438Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:42:40.250Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:42:40.260Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:44:24.624Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:44:24.632Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:48:24.142Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:48:24.148Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:52:24.205Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:52:24.214Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:53:45.351Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:53:45.361Z"
+    },
+    {
+      "type": "temperature",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 22.9,
+      "timestamp": "2025-11-26T15:56:21.250Z"
+    },
+    {
+      "type": "humidity",
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "value": 45,
+      "timestamp": "2025-11-26T15:56:21.260Z"
+    }
+  ],
+  "temperature": [
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T09:54:11.895Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T09:59:11.316Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:04:11.813Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:25:02.592Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:30:02.610Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:42:22.253Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:47:21.680Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:51:34.403Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:02:40.258Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:09:32.329Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:11:31.420Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:41:10.840Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:45:59.452Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:52:24.016Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:56:35.308Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:00:34.255Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:11:54.146Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:13:23.990Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:16:37.798Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:18:58.418Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:23:58.752Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:31:39.639Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:32:58.577Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:41:46.820Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:49:34.937Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:52:37.792Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:56:32.421Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T13:01:32.861Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T13:13:14.919Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T13:16:18.075Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:08:17.717Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:13:11.717Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:19:30.071Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:27:42.961Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:31:03.839Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:33:15.253Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:36:09.288Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:39:00.481Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:40:36.256Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:48:25.512Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:53:25.552Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:55:47.973Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:56:48.253Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:02:06.762Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:11:06.470Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:16:06.849Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:21:06.356Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:26:06.031Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:31:06.440Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:36:06.431Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:41:06.932Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:46:06.101Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:51:06.232Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T17:03:52.873Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T17:11:04.672Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T17:16:43.138Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T17:20:27.456Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T17:24:22.739Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T04:13:40.105Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T04:22:59.929Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T04:23:19.008Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T04:24:55.316Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T04:58:56.940Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:02:51.445Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:13:58.094Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:18:43.153Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:22:49.523Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:32:11.874Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:49:59.602Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:53:08.788Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:56:10.708Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:57:18.155Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:59:33.943Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T06:03:06.287Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T06:09:06.741Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T06:09:50.525Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T06:14:58.786Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T14:47:25.981Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T14:54:53.614Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T14:57:51.974Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:00:02.730Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:05:00.390Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:17:30.758Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:18:15.411Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:22:35.069Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:27:33.578Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:40:02.247Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:38:14.199Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:45:46.279Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:47:33.776Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:51:33.950Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:57:52.832Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:59:37.138Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:06:43.836Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:19:06.535Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:20:50.131Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:24:39.022Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:32:21.056Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:34:04.735Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:45:11.152Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:46:54.735Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:30:17.240Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:31:59.998Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:36:00.545Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:54:57.678Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:56:41.273Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:57:48.091Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:04:23.228Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:06:06.761Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:09:47.986Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:11:34.938Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:14:07.578Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:15:55.067Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:19:55.140Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:21:39.100Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:24:02.277Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:32:39.404Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:33:26.528Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:35:13.780Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:39:13.859Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:41:29.394Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:43:17.331Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:44:41.911Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:46:27.623Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:50:27.836Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:02:24.047Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:04:07.645Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:11:49.132Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:13:36.579Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:19:14.388Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:26:13.838Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:28:01.780Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:29:01.108Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:30:15.895Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:30:46.778Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:32:03.598Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:33:34.865Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:35:21.328Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:37:08.428Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:42:40.250Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:44:24.624Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:48:24.142Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:52:24.205Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:53:45.351Z"
+    },
+    {
+      "value": 22.9,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:56:21.250Z"
+    }
+  ],
+  "humidity": [
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T09:54:11.898Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T09:59:11.317Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:04:11.815Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:25:02.596Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:42:22.257Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T10:51:34.407Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:41:10.843Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:45:59.458Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T11:52:24.019Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:16:37.800Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:18:58.425Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:41:46.822Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:49:34.940Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:52:37.794Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T12:56:32.424Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T13:01:32.863Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T13:13:14.922Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T13:16:18.078Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:08:17.719Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:13:11.719Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T15:48:25.514Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:02:06.764Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:11:06.473Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:16:06.852Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:21:06.358Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:26:06.034Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:31:06.443Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:36:06.435Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:41:06.934Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:46:06.104Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T16:51:06.235Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-10T17:03:52.876Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:13:58.101Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T05:57:18.163Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T06:03:06.300Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:00:02.734Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T15:22:35.075Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:45:46.284Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:47:33.782Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T16:57:52.835Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:06:43.840Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:19:06.538Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:24:39.029Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:32:21.060Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T17:45:11.162Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:30:17.248Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:32:00.005Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-11T18:54:57.685Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:04:23.232Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:09:47.991Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:14:07.585Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:19:55.145Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:33:26.538Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:35:13.787Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:41:32.366Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:44:41.918Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T14:46:27.628Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:02:24.055Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:04:07.651Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:11:49.138Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:13:36.583Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:26:13.847Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:35:21.333Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:42:40.260Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:44:24.632Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:48:24.148Z"
+    },
+    {
+      "value": 45,
+      "deviceId": "0660d5c0-4528-4f2d-ac13-ee4c5464a14c",
+      "timestamp": "2025-11-26T15:53:45.361Z"
+    }
+  ],
+  "power": [],
+  "notifications": []
+}

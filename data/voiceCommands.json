@@ -1,0 +1,47 @@
+[
+  {
+    "text": "Включи лампочку",
+    "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+    "action": "on"
+  },
+  {
+    "text": "Выключи лампочку",
+    "deviceId": "3eb7dfd0-f689-4e9d-bd73-1402ade23729",
+    "action": "off"
+  },
+  {
+    "text": "Включи ленту",
+    "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+    "action": "on"
+  },
+  {
+    "text": "Выключи ленту",
+    "deviceId": "92851bcd-65d9-46a3-b94a-243d849bbdcd",
+    "action": "off"
+  },
+  {
+    "text": "Включи воду",
+    "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+    "action": "on"
+  },
+  {
+    "text": "Выключи воду",
+    "deviceId": "669f2efa-dd2d-408e-9b1b-16e877543ffb",
+    "action": "off"
+  },
+  {
+    "text": "Включи телевизор",
+    "deviceId": "d5f9495b-6359-a81d-c12e-aaa091713ada",
+    "action": "on"
+  },
+  {
+    "text": "Выключи телевизор",
+    "deviceId": "d5f9495b-6359-a81d-c12e-aaa091713ada",
+    "action": "off"
+  },
+  {
+    "text": "Включи вентилятор",
+    "deviceId": "90feff97-6638-46e6-a2e5-88a8f64c859b",
+    "action": "on"
+  }
+]
