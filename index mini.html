@@ -199,6 +199,14 @@
             border-radius: 8px;
             min-width: 110px;
         }
+
+        .forecast-day {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 6px;
+            text-transform: lowercase;
+        }
         
         .forecast-time {
             font-size: 16px;
@@ -510,13 +518,34 @@ function updateForecast() {
     }
     
     var html = '';
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var tomorrow = today + 24 * 60 * 60 * 1000;
+    var lastDayShown = null;
+    
     for (var i = 0; i < forecastData.length; i++) {
         var item = forecastData[i];
         var time = item.time || '--:--';
         var temp = item.temp !== undefined ? item.temp + '°' : '--°';
         var desc = item.description || '';
+        var dayTimestamp = typeof item.dayTimestamp === 'number' ? item.dayTimestamp : null;
+        var isToday = dayTimestamp !== null ? dayTimestamp === today : true;
+        var isNewDay = dayTimestamp !== null ? (!isToday && dayTimestamp !== lastDayShown) : false;
+        var dayLabel = '';
+        
+        if (isNewDay) {
+            if (dayTimestamp === tomorrow) {
+                dayLabel = 'Завтра';
+            } else if (item.date) {
+                dayLabel = item.date;
+            }
+            lastDayShown = dayTimestamp;
+        }
         
         html += '<div class="forecast-item">';
+        if (dayLabel) {
+            html += '<span class="forecast-day">' + dayLabel + '</span>';
+        }
         html += '<span class="forecast-time">' + time + '</span>';
         html += '<span class="forecast-temp">' + temp + '</span>';
         if (desc) {
