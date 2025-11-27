@@ -1,0 +1,749 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+body {
+    font-family: 'Inter', sans-serif;
+    overscroll-behavior: none; /* Отключаем "оттягивание" страницы на мобильных */
+}
+/* Стили для спиннера */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Стили для кастомного свитча (toggle) */
+.toggle-checkbox:checked {
+    @apply: bg-blue-600;
+    right: 0;
+    border-color: #3b82f6;
+}
+.toggle-checkbox:checked + .toggle-label {
+    @apply: bg-blue-600;
+}
+
+/* Стили для индикаторов (контейнер) */
+.indicators-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+}
+
+/* Стили для индикатора подключения (сервер) */
+.connection-indicator {
+    width: 24px;
+    height: 24px;
+    transition: color 0.3s ease;
+}
+.connection-indicator.connected {
+    color: #22c55e; /* Зеленый */
+}
+.connection-indicator.disconnected {
+    color: #ef4444; /* Красный */
+}
+
+/* Стили для индикатора микрофона */
+.microphone-indicator {
+    width: 24px;
+    height: 24px;
+    transition: color 0.3s ease, opacity 0.3s ease;
+    display: none; /* По умолчанию скрыт */
+}
+.microphone-indicator.visible {
+    display: block;
+}
+.microphone-indicator.working {
+    color: #22c55e; /* Зеленый - микрофон работает */
+}
+.microphone-indicator.not-working {
+    color: #ef4444; /* Красный - микрофон не работает */
+}
+
+/* Стили для индикатора батареи */
+.battery-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+.battery-indicator.high {
+    color: #22c55e; /* Зеленый - > 50% */
+}
+.battery-indicator.medium {
+    color: #eab308; /* Желтый - 20-50% */
+}
+.battery-indicator.low {
+    color: #ef4444; /* Красный - < 20% */
+}
+.battery-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Стили для индикатора оффлайн устройств */
+.offline-devices-indicator {
+    width: 24px;
+    height: 24px;
+    position: relative;
+    cursor: pointer;
+    transition: color 0.3s ease, opacity 0.3s ease;
+    color: #ef4444; /* Красный цвет */
+    display: block; /* Всегда показываем как block, скрываем через hidden */
+}
+.offline-devices-indicator.hidden {
+    display: none;
+    pointer-events: none; /* Отключаем события мыши когда скрыт */
+}
+.offline-devices-indicator:not(.hidden):hover {
+    color: #dc2626; /* Более темный красный при наведении */
+    opacity: 0.8;
+}
+.offline-devices-indicator:not(.hidden) {
+    pointer-events: auto; /* Включаем события мыши когда видим */
+}
+.offline-cloud-icon {
+    width: 24px;
+    height: 24px;
+    pointer-events: auto; /* SVG должен принимать клики */
+}
+.offline-strike {
+    stroke: currentColor;
+    stroke-width: 2.5;
+    pointer-events: none; /* Линия зачеркивания не должна перехватывать клики */
+}
+.offline-devices-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    border: 2px solid #000;
+    pointer-events: auto; /* Badge должен принимать клики */
+    cursor: pointer;
+}
+
+/* Всплывающий блок для заблокированного экрана */
+.offline-devices-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    max-width: 300px;
+    background-color: rgba(31, 41, 55, 0.95);
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+}
+.offline-devices-popup.hidden {
+    display: none;
+}
+.offline-devices-popup-content {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.offline-devices-popup-content::-webkit-scrollbar {
+    width: 4px;
+}
+.offline-devices-popup-content::-webkit-scrollbar-track {
+    background: rgba(55, 65, 81, 0.5);
+    border-radius: 2px;
+}
+.offline-devices-popup-content::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 2px;
+}
+
+/* Кнопка полноэкранного режима (только для мобильных) */
+.fullscreen-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: rgba(59, 130, 246, 0.9);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.fullscreen-button:hover {
+    background: rgba(59, 130, 246, 1);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.fullscreen-button:active {
+    transform: scale(0.95);
+}
+
+.fullscreen-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Показываем кнопку только на мобильных устройствах */
+@media (max-width: 768px) {
+    .fullscreen-button {
+        display: flex;
+    }
+}
+
+/* Анимация полос при выполнении голосовой команды */
+.voice-command-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.voice-command-animation.active {
+    opacity: 1;
+}
+
+.voice-strip {
+    position: absolute;
+    width: 10px;
+    height: 0;
+    border-radius: 5px;
+    background: linear-gradient(
+        180deg,
+        #ff0000 0%,
+        #ff8000 14.28%,
+        #ffff00 28.57%,
+        #00ff00 42.85%,
+        #0080ff 57.14%,
+        #8000ff 71.42%,
+        #ff00ff 85.71%,
+        #ff0080 100%
+    );
+    box-shadow: 
+        0 0 15px rgba(255, 0, 0, 0.8),
+        0 0 30px rgba(255, 128, 0, 0.6),
+        0 0 45px rgba(255, 255, 0, 0.4),
+        0 0 60px rgba(0, 255, 0, 0.3),
+        0 0 75px rgba(0, 128, 255, 0.25),
+        0 0 90px rgba(128, 0, 255, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transform-origin: bottom center;
+}
+
+.voice-strip-left {
+    bottom: 0;
+    left: 0;
+    animation: voiceStripLeft 1.2s ease-out forwards;
+}
+
+.voice-strip-right {
+    bottom: 0;
+    right: 0;
+    animation: voiceStripRight 1.2s ease-out forwards;
+}
+
+@keyframes voiceStripLeft {
+    0% {
+        opacity: 0;
+        height: 0;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%) scaleY(0);
+        filter: blur(0px);
+    }
+    5% {
+        opacity: 1;
+        height: 100px;
+        filter: blur(1px);
+    }
+    50% {
+        height: 60vh;
+        left: 0;
+        bottom: 50%;
+        transform: translateX(0) translateY(50%) scaleY(1);
+        filter: blur(0px);
+    }
+    95% {
+        opacity: 1;
+        height: 100px;
+        left: 50%;
+        bottom: 100%;
+        transform: translateX(-50%) translateY(-100%) scaleY(1);
+        filter: blur(1px);
+    }
+    100% {
+        opacity: 0;
+        height: 0;
+        left: 50%;
+        bottom: 100%;
+        transform: translateX(-50%) translateY(-100%) scaleY(0);
+        filter: blur(2px);
+    }
+}
+
+@keyframes voiceStripRight {
+    0% {
+        opacity: 0;
+        height: 0;
+        right: 50%;
+        bottom: 0;
+        transform: translateX(50%) scaleY(0);
+        filter: blur(0px);
+    }
+    5% {
+        opacity: 1;
+        height: 100px;
+        filter: blur(1px);
+    }
+    50% {
+        height: 60vh;
+        right: 0;
+        bottom: 50%;
+        transform: translateX(0) translateY(50%) scaleY(1);
+        filter: blur(0px);
+    }
+    95% {
+        opacity: 1;
+        height: 100px;
+        right: 50%;
+        bottom: 100%;
+        transform: translateX(50%) translateY(-100%) scaleY(1);
+        filter: blur(1px);
+    }
+    100% {
+        opacity: 0;
+        height: 0;
+        right: 50%;
+        bottom: 100%;
+        transform: translateX(50%) translateY(-100%) scaleY(0);
+        filter: blur(2px);
+    }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .voice-strip {
+        width: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .voice-strip {
+        width: 6px;
+    }
+}
+
+/* Анимации погоды (оптимизировано для 24/7 работы) */
+.weather-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.weather-animation.weather-paused,
+.weather-animation.weather-paused * {
+    animation-play-state: paused !important;
+}
+
+/* Анимация снега (GPU ускорение) */
+.snowflake {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
+    animation: fall linear infinite;
+    will-change: transform, opacity;
+    pointer-events: none;
+}
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+.snow-light .snowflake {
+    animation-duration: 12s;
+    opacity: 0.4;
+}
+.snow-medium .snowflake {
+    animation-duration: 8s;
+    opacity: 0.6;
+}
+.snow-heavy .snowflake {
+    animation-duration: 6s;
+    opacity: 0.8;
+}
+
+/* Анимация дождя (оптимизировано) */
+.raindrop {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent 0%, rgba(174, 194, 224, 0.7) 50%, rgba(174, 194, 224, 0.9) 100%);
+    animation: rain linear infinite;
+    will-change: transform;
+    pointer-events: none;
+}
+@keyframes rain {
+    to {
+        transform: translateY(100vh);
+    }
+}
+
+.rain-light .raindrop {
+    animation-duration: 1.2s;
+    opacity: 0.3;
+    height: 12px;
+    width: 1.5px;
+}
+.rain-medium .raindrop {
+    animation-duration: 0.8s;
+    opacity: 0.5;
+    height: 18px;
+    width: 2px;
+}
+.rain-heavy .raindrop {
+    animation-duration: 0.6s;
+    opacity: 0.7;
+    height: 24px;
+    width: 2.5px;
+}
+
+/* Анимация солнечных лучей (оптимизировано) */
+.sunrays {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, 
+        rgba(255, 255, 220, 0.4) 0%,
+        rgba(255, 240, 150, 0.25) 20%,
+        rgba(255, 220, 120, 0.15) 35%,
+        rgba(255, 200, 100, 0.08) 50%,
+        transparent 75%);
+    animation: sunrayPulse ease-in-out infinite;
+    will-change: opacity, transform;
+    pointer-events: none;
+}
+
+/* Дополнительный слой с лучами для большей яркости */
+.sunrays::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, 
+        rgba(255, 255, 180, 0.3) 0%,
+        rgba(255, 230, 140, 0.2) 25%,
+        transparent 60%);
+    animation: sunrayRotate 15s linear infinite;
+    will-change: transform;
+}
+
+@keyframes sunrayPulse {
+    0%, 100% { 
+        opacity: 0.6; 
+        transform: scale(1) rotate(0deg); 
+    }
+    50% { 
+        opacity: 0.85; 
+        transform: scale(1.08) rotate(1deg); 
+    }
+}
+
+@keyframes sunrayRotate {
+    0% { 
+        transform: rotate(0deg) scale(1);
+        opacity: 0.4;
+    }
+    50% { 
+        transform: rotate(180deg) scale(1.1);
+        opacity: 0.6;
+    }
+    100% { 
+        transform: rotate(360deg) scale(1);
+        opacity: 0.4;
+    }
+}
+
+.sunlight-light .sunrays {
+    animation-duration: 10s;
+    opacity: 0.5;
+}
+.sunlight-light .sunrays::before {
+    opacity: 0.3;
+}
+.sunlight-medium .sunrays {
+    animation-duration: 7s;
+    opacity: 0.7;
+}
+.sunlight-medium .sunrays::before {
+    opacity: 0.5;
+}
+.sunlight-heavy .sunrays {
+    animation-duration: 5s;
+    opacity: 0.9;
+}
+.sunlight-heavy .sunrays::before {
+    opacity: 0.7;
+}
+
+/* Прогноз по часам с горизонтальным скроллом */
+.hourly-forecast-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE и Edge */
+    padding: 8px 0;
+    margin-bottom: 12px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-container {
+        padding: 10px 0;
+        margin-bottom: 15px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hourly-forecast-container {
+        padding: 12px 0;
+        margin-bottom: 20px;
+    }
+}
+
+.hourly-forecast-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.hourly-forecast-scroll {
+    display: flex;
+    gap: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    min-width: min-content;
+    width: max-content;
+    box-sizing: border-box;
+    align-items: stretch;
+    /* === ИЗМЕНЕНИЕ ЗДЕСЬ === */
+    /* Центрируем блок, если он меньше ширины экрана */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-scroll {
+        gap: 16px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hourly-forecast-scroll {
+        gap: 20px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+
+.hourly-forecast-item {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    width: 70px;
+    padding: 8px 6px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-item {
+        min-width: 80px;
+        width: 80px;
+        padding: 10px;
+    }
+}
+
+.hourly-forecast-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hourly-forecast-day {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 3px;
+    font-weight: 500;
+    text-transform: capitalize;
+    text-align: center;
+    line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-day {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+}
+
+.hourly-forecast-time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 6px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-time {
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+}
+
+.hourly-forecast-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 6px;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-icon {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 8px;
+    }
+}
+
+.hourly-forecast-temp {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .hourly-forecast-temp {
+        font-size: 18px;
+    }
+}
+
+/* Стили для индикатора яркости при удержании - заполнение блока */
+.brightness-indicator-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.device-card.brightness-active .brightness-indicator-container {
+    opacity: 1;
+}
+
+.brightness-indicator-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, 
+        rgba(250, 204, 21, 0.35) 0%,
+        rgba(251, 191, 36, 0.45) 25%,
+        rgba(250, 204, 21, 0.5) 50%,
+        rgba(251, 191, 36, 0.55) 75%,
+        rgba(250, 204, 21, 0.6) 100%);
+    border-radius: 1rem 0 0 1rem;
+    transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        inset -3px 0 12px rgba(250, 204, 21, 0.4),
+        inset 0 0 20px rgba(250, 204, 21, 0.2);
+    backdrop-filter: blur(2px);
+    border-right: 2px solid rgba(250, 204, 21, 0.6);
+}
+
+/* Более яркое заполнение при активном управлении */
+.device-card.brightness-active .brightness-indicator-fill {
+    background: linear-gradient(90deg, 
+        rgba(250, 204, 21, 0.5) 0%,
+        rgba(251, 191, 36, 0.6) 25%,
+        rgba(250, 204, 21, 0.65) 50%,
+        rgba(251, 191, 36, 0.7) 75%,
+        rgba(250, 204, 21, 0.75) 100%);
+    box-shadow: 
+        inset -4px 0 16px rgba(250, 204, 21, 0.6),
+        inset 0 0 30px rgba(250, 204, 21, 0.3),
+        0 0 20px rgba(250, 204, 21, 0.2);
+    border-right: 3px solid rgba(250, 204, 21, 0.8);
+}
+
+/* Делаем контент поверх индикатора */
+.device-card .device-content,
+.device-card .device-toggle {
+    position: relative;
+    z-index: 2;
+}
+
+.device-card.brightness-active {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(250, 204, 21, 0.4);
+    border-color: rgba(250, 204, 21, 0.6) !important;
+}
+
