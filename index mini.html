@@ -266,27 +266,28 @@
         }
 
         .devices-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             margin-bottom: 10px;
-            gap: 10px;
+            overflow: hidden; /* чтобы обтекание не ломало высоту */
         }
         
         .devices-header h2 {
+            float: left;
             font-size: 18px;
             color: #888;
         }
 
         .off-all-btn {
-            padding: 8px 12px;
-            border-radius: 6px;
+            float: right;
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
             border: none;
             background: #700;
             color: #fff;
-            font-size: 13px;
+            font-size: 18px;
+            line-height: 32px;
+            text-align: center;
             cursor: pointer;
-            white-space: nowrap;
         }
 
         .off-all-btn:active {
@@ -489,7 +490,7 @@
     <div class="page" id="page-devices">
         <div class="devices-header">
             <h2>Устройства</h2>
-            <button class="off-all-btn" onclick="turnOffAllMiniDevices()">Выключить всё</button>
+            <button class="off-all-btn" onclick="turnOffAllMiniDevices()" title="Выключить всё">&#x23FB;</button>
         </div>
         <div id="devices-list">
             <div class="no-devices">Загрузка...</div>
