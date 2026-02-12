@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#0b0b0b; color:#fff; margin:0; padding:20px; }
+    .card { max-width:520px; margin:20px auto; background:#1a1a1a; border-radius:12px; padding:20px; }
+    input, button { width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #333; background:#111; color:#fff; }
+    button { background:#2563eb; border:0; cursor:pointer; }
+    .row { display:flex; gap:10px; align-items:center; }
+    .row input[type="checkbox"] { width:auto; }
+    .hidden { display:none; }
+    .status { color:#93c5fd; margin-top:8px; min-height:18px; }
+  </style>
+</head>
+<body>
+  <div class="card" id="loginCard">
+    <h2>Админ /admin</h2>
+    <input id="adminPassword" type="password" placeholder="Пароль администратора" />
+    <button id="loginBtn">Войти</button>
+    <div id="loginStatus" class="status"></div>
+  </div>
+
+  <div class="card hidden" id="configCard">
+    <h2>Доступ к Index / Index mini</h2>
+    <label class="row"><input id="accessPinEnabled" type="checkbox" /> Включить PIN-код</label>
+    <input id="accessPin" type="text" placeholder="PIN-код для пользователей" maxlength="12" />
+    <button id="saveBtn">Сохранить</button>
+    <div id="saveStatus" class="status"></div>
+  </div>
+
+<script>
+var token = '';
+function $(id){return document.getElementById(id);}
+
+$('loginBtn').onclick = function(){
+  fetch('/api/admin/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ password: $('adminPassword').value })
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res){
+      if(!res.ok){ $('loginStatus').innerHTML = 'Неверный пароль'; return; }
+      token = res.data.token;
+      $('loginCard').className = 'card hidden';
+      $('configCard').className = 'card';
+      loadConfig();
+    }).catch(function(){ $('loginStatus').innerHTML = 'Ошибка сети'; });
+};
+
+function loadConfig(){
+  fetch('/api/admin/config', { headers: {'x-admin-token': token} })
+    .then(function(r){ return r.json(); })
+    .then(function(cfg){
+      $('accessPinEnabled').checked = !!cfg.accessPinEnabled;
+      $('accessPin').value = cfg.accessPin || '';
+    });
+}
+
+$('saveBtn').onclick = function(){
+  fetch('/api/admin/config', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-admin-token':token},
+    body: JSON.stringify({
+      accessPinEnabled: $('accessPinEnabled').checked,
+      accessPin: $('accessPin').value
+    })
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res){ $('saveStatus').innerHTML = res.ok ? 'Сохранено' : 'Ошибка сохранения'; })
+    .catch(function(){ $('saveStatus').innerHTML = 'Ошибка сети'; });
+};
+</script>
+</body>
+</html>

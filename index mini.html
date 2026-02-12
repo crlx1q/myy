@@ -351,6 +351,57 @@
         .back-btn:active {
             background: #555;
         }
+
+        .night-mode {
+            opacity: 0.7;
+        }
+
+        .idle-dim {
+            opacity: 0.18;
+        }
+
+        .access-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10001;
+            display: none;
+            text-align: center;
+            padding-top: 120px;
+        }
+
+        .access-overlay.visible { display: block; }
+
+        .access-box {
+            width: 80%;
+            margin: 0 auto;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .access-input {
+            width: 100%;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .access-btn {
+            width: 100%;
+            padding: 10px;
+            border: 0;
+            background: #2457cc;
+            color: #fff;
+        }
+
     </style>
 </head>
 <body>
@@ -363,6 +414,15 @@
     <div id="connection-overlay" class="connection-overlay">
         <div class="connection-overlay-content">
             <div class="connection-overlay-text">Нет подключения к серверу</div>
+        </div>
+    </div>
+
+    <div id="access-overlay" class="access-overlay">
+        <div class="access-box">
+            <div>Введите PIN</div>
+            <input id="access-pin-input" class="access-input" type="password" maxlength="12" />
+            <button id="access-pin-btn" class="access-btn">Открыть</button>
+            <div id="access-pin-error" style="color:#f66; margin-top:8px;"></div>
         </div>
     </div>
     
@@ -404,6 +464,7 @@
     <!-- Страница устройств (свайп влево) -->
     <div class="page" id="page-devices">
         <h2>Устройства</h2>
+        <button class="back-btn" style="left:15px; margin-left:0; width:140px; bottom:70px;" onclick="turnOffAllMiniDevices()">Выключить всё</button>
         <div id="devices-list">
             <div class="no-devices">Загрузка...</div>
         </div>
@@ -422,6 +483,11 @@ var insideHumidity = null;
 var isOnline = false;
 var pollInterval = null;
 var errorCount = 0;
+var idleTimer = null;
+var idleMoveTimer = null;
+var idleMinutes = 5;
+var idleMoveEnabled = true;
+var isIdleSleeping = false;
 
 // Получить элемент по ID
 function $(id) {
@@ -841,6 +907,90 @@ document.addEventListener('touchend', function(e) {
     }
 }, false);
 
+
+function wakeFromIdle() {
+    isIdleSleeping = false;
+    document.body.className = document.body.className.replace(/\bidle-dim\b/g, '');
+    if ($('page-clock')) {
+        $('page-clock').style.transform = 'translate(0px,0px)';
+    }
+}
+
+function applyIdleMove() {
+    if (!isIdleSleeping || !idleMoveEnabled) return;
+    var dx = Math.floor((Math.random() * 21) - 10);
+    var dy = Math.floor((Math.random() * 21) - 10);
+    if ($('page-clock')) {
+        $('page-clock').style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    }
+}
+
+function scheduleIdleProtection() {
+    if (idleTimer) clearTimeout(idleTimer);
+    if (!idleMoveEnabled) return;
+    idleTimer = setTimeout(function() {
+        isIdleSleeping = true;
+        if (document.body.className.indexOf('idle-dim') < 0) {
+            document.body.className += ' idle-dim';
+        }
+        applyIdleMove();
+    }, idleMinutes * 60 * 1000);
+}
+
+function onUserActivity() {
+    wakeFromIdle();
+    scheduleIdleProtection();
+}
+
+function turnOffAllMiniDevices() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/mini/control-all', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            setTimeout(fetchData, 600);
+        }
+    };
+    xhr.send(null);
+}
+
+function initAccess() {
+    fetch('/api/access/status').then(function(r){ return r.json(); }).then(function(cfg){
+        if (cfg.nightMode) {
+            if (document.body.className.indexOf('night-mode') < 0) {
+                document.body.className += ' night-mode';
+            }
+        }
+        idleMinutes = cfg.idleMoveMinutes || 5;
+        idleMoveEnabled = cfg.idleMoveEnabled !== false;
+        scheduleIdleProtection();
+
+        if (!cfg.accessPinEnabled) return;
+        var overlay = $('access-overlay');
+        var input = $('access-pin-input');
+        var btn = $('access-pin-btn');
+        var err = $('access-pin-error');
+        overlay.className = 'access-overlay visible';
+
+        function submitPin() {
+            var x = new XMLHttpRequest();
+            x.open('POST', '/api/access/verify-pin', true);
+            x.setRequestHeader('Content-Type', 'application/json');
+            x.onreadystatechange = function(){
+                if (x.readyState !== 4) return;
+                if (x.status === 200) {
+                    overlay.className = 'access-overlay';
+                    err.innerHTML = '';
+                    input.value = '';
+                } else {
+                    err.innerHTML = 'Неверный PIN';
+                }
+            };
+            x.send(JSON.stringify({ pin: input.value }));
+        }
+        btn.onclick = submitPin;
+    });
+}
+
 // Запуск
 function init() {
     // Обновляем часы
@@ -851,6 +1001,15 @@ function init() {
     setOnline(false);
     showConnectionError();
     
+    initAccess();
+
+    ['click','touchstart','mousemove','keydown'].forEach(function(evt){
+        document.addEventListener(evt, onUserActivity, false);
+    });
+
+    if (idleMoveTimer) clearInterval(idleMoveTimer);
+    idleMoveTimer = setInterval(applyIdleMove, 20000);
+
     // Первый запрос данных
     fetchData();
     

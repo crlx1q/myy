@@ -537,3 +537,20 @@ if (typeof window !== 'undefined') {
     window.turnOffGroup = turnOffGroup;
 }
 
+
+
+export async function turnOffAllDevices() {
+    const switchDevices = currentDevices.filter(device => {
+        const status = deviceStates[device.deviceId];
+        return status?.main?.switch?.switch?.value === 'on';
+    });
+
+    for (const device of switchDevices) {
+        try {
+            await controlDevice(device.deviceId, 'off', 'switch');
+            await new Promise(resolve => setTimeout(resolve, 120));
+        } catch (error) {
+            console.error('Ошибка отключения устройства:', device.deviceId, error);
+        }
+    }
+}

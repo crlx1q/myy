@@ -23,6 +23,9 @@ const io = socketIo(server, {
 // ==========================================
 const SMARTTHINGS_API_URL = 'https://api.smartthings.com/v1';
 const SMARTTHINGS_PAT = process.env.SMARTTHINGS_PAT; // Personal Access Token
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '651956';
+const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+const SMARTTHINGS_AUTH_SUSPEND_MS = 6 * 60 * 60 * 1000;
 
 const OPENWEATHER_KEY = process.env.OPENWEATHER_KEY;
 const WEATHER_CITY = process.env.WEATHER_CITY;
@@ -74,8 +77,89 @@ let settings = {
     soundNotifications: true,
     voiceControlEnabled: false,
     voiceControlStart: '07:00',
-    voiceControlEnd: '23:00'
+    voiceControlEnd: '23:00',
+    accessPinEnabled: false,
+    accessPin: '',
+    screenSleep: true,
+    screenSleepTime: 5,
+    idleMoveEnabled: true,
+    idleMoveMinutes: 5
 };
+
+const adminSessions = new Map();
+const smartThingsAuthState = {
+    lastErrorStatus: null,
+    lastFailureAt: null,
+    suspendUntil: 0,
+    consecutiveFailures: 0
+};
+
+function getNightModeStatus(now = new Date()) {
+    const hour = now.getHours();
+    return hour >= 23 || hour < 8;
+}
+
+function getDynamicSleepMinutes() {
+    return getNightModeStatus() ? 30 : 5;
+}
+
+function createAdminSession() {
+    const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    adminSessions.set(token, Date.now() + ADMIN_SESSION_TTL_MS);
+    return token;
+}
+
+function isAdminSessionValid(token) {
+    if (!token || !adminSessions.has(token)) return false;
+    const expiresAt = adminSessions.get(token);
+    if (Date.now() > expiresAt) {
+        adminSessions.delete(token);
+        return false;
+    }
+    return true;
+}
+
+function requireAdminAuth(req, res, next) {
+    const token = req.headers['x-admin-token'];
+    if (!isAdminSessionValid(token)) {
+        return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+    next();
+}
+
+async function smartThingsFetch(endpoint, options = {}) {
+    if (!SMARTTHINGS_PAT) {
+        throw new Error('SMARTTHINGS_PAT не задан');
+    }
+
+    if (Date.now() < smartThingsAuthState.suspendUntil) {
+        const until = new Date(smartThingsAuthState.suspendUntil).toLocaleString('ru-RU');
+        throw new Error(`SmartThings API временно приостановлен до ${until} после ошибки авторизации`);
+    }
+
+    const response = await fetch(`${SMARTTHINGS_API_URL}${endpoint}`, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            'Authorization': `Bearer ${SMARTTHINGS_PAT}`
+        }
+    });
+
+    if (response.status === 401 || response.status === 403) {
+        smartThingsAuthState.lastErrorStatus = response.status;
+        smartThingsAuthState.lastFailureAt = Date.now();
+        smartThingsAuthState.consecutiveFailures += 1;
+        smartThingsAuthState.suspendUntil = Date.now() + SMARTTHINGS_AUTH_SUSPEND_MS;
+        console.error('SmartThings вернул ошибку авторизации. Включена пауза запросов на 6 часов, чтобы не спамить API.');
+    } else if (response.ok) {
+        smartThingsAuthState.consecutiveFailures = 0;
+        smartThingsAuthState.lastErrorStatus = null;
+        smartThingsAuthState.lastFailureAt = null;
+        smartThingsAuthState.suspendUntil = 0;
+    }
+
+    return response;
+}
 
 // Очереди и состояние обновлений устройств
 let deviceRefreshQueue = [];
@@ -131,6 +215,58 @@ app.post('/api/settings', (req, res) => {
         console.error('Ошибка сохранения настроек:', error);
         res.status(500).json({ success: false, error: error.message });
     }
+});
+
+app.get('/api/access/status', (req, res) => {
+    res.json({
+        accessPinEnabled: settings.accessPinEnabled === true && !!settings.accessPin,
+        nightMode: getNightModeStatus(),
+        screenSleepTime: getDynamicSleepMinutes(),
+        idleMoveMinutes: settings.idleMoveMinutes || 5,
+        idleMoveEnabled: settings.idleMoveEnabled !== false
+    });
+});
+
+app.post('/api/access/verify-pin', (req, res) => {
+    const pin = String(req.body?.pin || '');
+    const enabled = settings.accessPinEnabled === true && !!settings.accessPin;
+
+    if (!enabled) {
+        return res.json({ success: true, bypass: true });
+    }
+
+    if (pin === String(settings.accessPin)) {
+        return res.json({ success: true });
+    }
+
+    return res.status(401).json({ success: false, error: 'Неверный PIN' });
+});
+
+app.post('/api/admin/login', (req, res) => {
+    const password = String(req.body?.password || '');
+    if (password !== ADMIN_PASSWORD) {
+        return res.status(401).json({ success: false, error: 'Неверный пароль' });
+    }
+
+    const token = createAdminSession();
+    res.json({ success: true, token, expiresInMs: ADMIN_SESSION_TTL_MS });
+});
+
+app.get('/api/admin/config', requireAdminAuth, (req, res) => {
+    res.json({
+        accessPinEnabled: settings.accessPinEnabled === true,
+        accessPin: settings.accessPin || '',
+        nightMode: getNightModeStatus(),
+        dynamicScreenSleepTime: getDynamicSleepMinutes()
+    });
+});
+
+app.post('/api/admin/config', requireAdminAuth, (req, res) => {
+    const payload = req.body || {};
+    settings.accessPinEnabled = payload.accessPinEnabled === true;
+    settings.accessPin = payload.accessPin ? String(payload.accessPin).trim() : '';
+    saveDataFile(SETTINGS_FILE, settings);
+    res.json({ success: true });
 });
 
 
@@ -294,9 +430,8 @@ async function enrichDeviceCapabilities(device, { force = false } = {}) {
     let detailLoaded = false;
 
     try {
-        const deviceDetailResponse = await fetch(`${SMARTTHINGS_API_URL}/devices/${device.deviceId}`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` }
+        const deviceDetailResponse = await smartThingsFetch(`/devices/${device.deviceId}`, {
+            method: 'GET'
         });
 
         if (deviceDetailResponse.ok) {
@@ -343,9 +478,8 @@ async function enrichDeviceCapabilities(device, { force = false } = {}) {
 
 async function fetchDevicesList(includeCapabilities = false) {
     try {
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` }
+        const response = await smartThingsFetch('/devices', {
+            method: 'GET'
         });
 
         if (!response.ok) {
@@ -404,9 +538,8 @@ async function fetchDevicesList(includeCapabilities = false) {
 // Получение статуса здоровья устройства (онлайн/оффлайн)
 async function getDeviceHealth(deviceId) {
     try {
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices/${deviceId}/health`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` }
+        const response = await smartThingsFetch(`/devices/${deviceId}/health`, {
+            method: 'GET'
         });
         
         if (!response.ok) {
@@ -434,9 +567,8 @@ async function getDeviceStatus(deviceId) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд таймаут
         
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices/${deviceId}/status`, {
+        const response = await smartThingsFetch(`/devices/${deviceId}/status`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` },
             signal: controller.signal
         });
         
@@ -619,10 +751,9 @@ async function controlDevice(deviceId, command, capability = 'switch', arguments
             };
         }
 
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices/${deviceId}/commands`, {
+        const response = await smartThingsFetch(`/devices/${deviceId}/commands`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${SMARTTHINGS_PAT}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
@@ -1015,6 +1146,10 @@ io.on('connection', (socket) => {
 // HTTP РОУТЫ
 // ==========================================
 
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 // Раздача статических файлов
 app.use(express.static(path.join(__dirname)));
 
@@ -1024,7 +1159,13 @@ app.get('/api/status', (req, res) => {
         status: 'ok',
         connectedClients: io.sockets.sockets.size,
         devicesCount: currentDevices.length,
-        lastUpdate: new Date().toISOString()
+        lastUpdate: new Date().toISOString(),
+        smartThingsAuth: {
+            suspended: Date.now() < smartThingsAuthState.suspendUntil,
+            suspendUntil: smartThingsAuthState.suspendUntil,
+            lastErrorStatus: smartThingsAuthState.lastErrorStatus,
+            consecutiveFailures: smartThingsAuthState.consecutiveFailures
+        }
     });
 });
 
@@ -1779,7 +1920,12 @@ app.get('/api/mini/data', (req, res) => {
         deviceStates: deviceStates,
         weather: weatherData,
         forecast: forecastData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        nightMode: getNightModeStatus(),
+        screenSleepTime: getDynamicSleepMinutes(),
+        idleMoveEnabled: settings.idleMoveEnabled !== false,
+        idleMoveMinutes: settings.idleMoveMinutes || 5,
+        accessPinEnabled: settings.accessPinEnabled === true && !!settings.accessPin
     });
 });
 
@@ -1794,6 +1940,24 @@ app.get('/api/mini/control', async (req, res) => {
     try {
         const result = await controlDevice(deviceId, command, capability || 'switch');
         res.json({ success: result.success, error: result.error || null });
+    } catch (error) {
+        res.json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/mini/control-all', async (req, res) => {
+    try {
+        const switchDevices = currentDevices.filter(device => {
+            const status = deviceStates[device.deviceId];
+            return status?.main?.switch?.switch?.value === 'on';
+        });
+
+        for (const device of switchDevices) {
+            await controlDevice(device.deviceId, 'off', 'switch');
+            await new Promise(resolve => setTimeout(resolve, 120));
+        }
+
+        res.json({ success: true, affected: switchDevices.length });
     } catch (error) {
         res.json({ success: false, error: error.message });
     }
@@ -1827,4 +1991,3 @@ server.listen(PORT, HOST, () => {
     console.log(`Сетевой доступ: http://${localIP}:${PORT}`);
     console.log(`Доступ по IP: http://192.168.100.13:${PORT} (если настроен)`);
 });
-

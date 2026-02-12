@@ -22,7 +22,7 @@ import { showAddVoiceCommandModal, saveVoiceCommand, deleteVoiceCommand, toggleV
 import { closeModal } from './utils.js';
 import { closeNotification } from './notifications.js';
 import { lockScreen, toggleFullscreen } from './screensaver.js';
-import { turnOffGroup } from './widgets.js';
+import { turnOffGroup, turnOffAllDevices } from './widgets.js';
 
 // Делаем функции доступными глобально
 if (typeof window !== 'undefined') {
@@ -67,6 +67,7 @@ if (typeof window !== 'undefined') {
     window.lockScreen = lockScreen;
     window.toggleFullscreen = toggleFullscreen;
     window.turnOffGroup = turnOffGroup;
+    window.turnOffAllDevices = turnOffAllDevices;
 }
 
 // Инициализация после загрузки DOM
