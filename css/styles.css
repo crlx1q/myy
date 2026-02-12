@@ -747,3 +747,18 @@ body {
     border-color: rgba(250, 204, 21, 0.6) !important;
 }
 
+
+/* Защита от выгорания */
+#dashboardView {
+    transition: transform 1.2s ease, opacity 0.8s ease, filter 0.8s ease;
+}
+
+body.burnin-protection-active #dashboardView,
+body.burnin-protection-active .indicators-container {
+    opacity: 0.12;
+    filter: brightness(0.45);
+}
+
+body.night-mode {
+    filter: brightness(0.7);
+}

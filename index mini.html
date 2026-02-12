@@ -351,6 +351,58 @@
         .back-btn:active {
             background: #555;
         }
+    
+        body.night-mode {
+            opacity: 0.75;
+        }
+
+        body.burnin-mini .page,
+        body.burnin-mini .status-bar {
+            opacity: 0.14;
+        }
+
+        #mini-pin-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 12000;
+            display: none;
+        }
+
+        #mini-pin-overlay.visible {
+            display: block;
+        }
+
+        .mini-pin-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -140px;
+            margin-top: -110px;
+            width: 280px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .mini-pin-input {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 10px 0;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -366,6 +418,16 @@
         </div>
     </div>
     
+
+    <div id="mini-pin-overlay">
+        <div class="mini-pin-box">
+            <div style="font-size:20px; font-weight:bold; margin-bottom:8px;">PIN доступ</div>
+            <input id="mini-pin-input" class="mini-pin-input" type="password" inputmode="numeric" placeholder="Введите PIN">
+            <button class="back-btn" style="position: static; margin: 0; width: 100%;" onclick="submitMiniPin()">Открыть</button>
+            <div id="mini-pin-error" style="color:#f66; font-size:12px; margin-top:8px; display:none;">Неверный PIN</div>
+        </div>
+    </div>
+
     <!-- Страница часов и погоды (главная) -->
     <div class="page active" id="page-clock">
         <!-- Погода сверху: снаружи и дома -->
@@ -399,6 +461,7 @@
         </div>
         
         <button class="back-btn" onclick="showPage(0)">Назад</button>
+        <button class="back-btn" style="bottom: 70px; background:#700;" onclick="turnOffAllMiniDevices()">Выключить всё</button>
     </div>
     
     <!-- Страница устройств (свайп влево) -->
@@ -422,6 +485,9 @@ var insideHumidity = null;
 var isOnline = false;
 var pollInterval = null;
 var errorCount = 0;
+var sleepMinutes = 5;
+var lastActivity = new Date().getTime();
+var burninTimer = null;
 
 // Получить элемент по ID
 function $(id) {
@@ -841,6 +907,113 @@ document.addEventListener('touchend', function(e) {
     }
 }, false);
 
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function setActivity() {
+    lastActivity = new Date().getTime();
+    document.body.className = document.body.className.replace(' burnin-mini', '').replace('burnin-mini', '');
+    var pages = document.getElementsByClassName('page');
+    for (var i = 0; i < pages.length; i++) {
+        pages[i].style.left = '0px';
+        pages[i].style.top = '0px';
+    }
+}
+
+function checkBurnin() {
+    var inactive = (new Date().getTime() - lastActivity) / 1000 / 60;
+    if (inactive >= sleepMinutes) {
+        if (document.body.className.indexOf('burnin-mini') === -1) {
+            document.body.className += ' burnin-mini';
+        }
+        var pages = document.getElementsByClassName('page');
+        var dx = randomInt(-10, 10);
+        var dy = randomInt(-10, 10);
+        for (var i = 0; i < pages.length; i++) {
+            pages[i].style.left = dx + 'px';
+            pages[i].style.top = dy + 'px';
+        }
+    }
+}
+
+function applyDisplayConfig(config) {
+    if (!config) return;
+    sleepMinutes = config.sleepMinutes || 5;
+    if (config.nightMode) {
+        if (document.body.className.indexOf('night-mode') === -1) {
+            document.body.className += ' night-mode';
+        }
+    } else {
+        document.body.className = document.body.className.replace(' night-mode', '').replace('night-mode', '');
+    }
+}
+
+function loadDisplayConfigMini() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/display-config', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            try {
+                applyDisplayConfig(JSON.parse(xhr.responseText));
+            } catch (e) {}
+        }
+    };
+    xhr.send(null);
+}
+
+function initMiniPinGate() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/dashboard/pin-config', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            try {
+                var data = JSON.parse(xhr.responseText);
+                if (data.required) {
+                    document.getElementById('mini-pin-overlay').className = 'visible';
+                }
+            } catch (e) {}
+        }
+    };
+    xhr.send(null);
+}
+
+function submitMiniPin() {
+    var pin = $('mini-pin-input').value || '';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/dashboard/unlock', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                $('mini-pin-overlay').className = '';
+            } else {
+                $('mini-pin-error').style.display = 'block';
+            }
+        }
+    };
+    xhr.send(JSON.stringify({ pin: pin }));
+}
+
+function turnOffAllMiniDevices() {
+    for (var i = 0; i < devices.length; i++) {
+        var dev = devices[i];
+        if (!dev || !dev.deviceId) continue;
+        var status = deviceStates[dev.deviceId];
+        if (status && status.main && status.main.switch && status.main.switch.switch && status.main.switch.switch.value === 'on') {
+            controlDevice(dev.deviceId, 'off');
+        }
+    }
+}
+
+
+
+document.addEventListener('mousedown', setActivity, false);
+document.addEventListener('mousemove', setActivity, false);
+document.addEventListener('click', setActivity, false);
+document.addEventListener('touchstart', setActivity, false);
+
 // Запуск
 function init() {
     // Обновляем часы
@@ -853,9 +1026,14 @@ function init() {
     
     // Первый запрос данных
     fetchData();
+    loadDisplayConfigMini();
+    initMiniPinGate();
+    if (burninTimer) clearInterval(burninTimer);
+    burninTimer = setInterval(checkBurnin, 15000);
     
     // Polling каждые 5 секунд
     pollInterval = setInterval(fetchData, 5000);
+    setInterval(loadDisplayConfigMini, 60000);
 }
 
 // Запускаем после загрузки
