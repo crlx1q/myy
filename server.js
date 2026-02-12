@@ -18,6 +18,26 @@ const io = socketIo(server, {
     }
 });
 
+// Часовой пояс системы (по умолчанию Кокшетау, Казахстан – UTC+6)
+const TIMEZONE = process.env.TIMEZONE || 'Asia/Almaty';
+
+// Вспомогательная функция получения часа в заданном часовом поясе
+function getHourInTimezone(date = new Date(), timeZone = TIMEZONE) {
+    try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+            hour: '2-digit',
+            hour12: false,
+            timeZone
+        });
+        const parts = formatter.formatToParts(date);
+        const hourPart = parts.find(p => p.type === 'hour');
+        return hourPart ? parseInt(hourPart.value, 10) : date.getHours();
+    } catch (e) {
+        // На старых средах без поддержки timeZone используем локальное время сервера
+        return date.getHours();
+    }
+}
+
 // ==========================================
 // НАСТРОЙКИ API (хранятся в переменных окружения)
 // ==========================================
@@ -96,7 +116,7 @@ let smartThingsAuthBlockedUntil = 0;
 
 
 function isNightModeActive(date = new Date()) {
-    const hour = date.getHours();
+    const hour = getHourInTimezone(date);
     return hour >= 23 || hour < 8;
 }
 
