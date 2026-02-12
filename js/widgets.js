@@ -491,6 +491,19 @@ function initializeBrightnessControls() {
     });
 }
 
+
+export async function turnOffAllDevices() {
+    const switchDevices = currentDevices.filter(device => {
+        const status = deviceStates[device.deviceId];
+        return status && status.main && status.main.switch && status.main.switch.switch && status.main.switch.switch.value === 'on';
+    });
+
+    for (const device of switchDevices) {
+        await controlDevice(device.deviceId, 'off');
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+}
+
 export async function turnOffGroup(groupId) {
     const groupName = groupId.split('-').map(word => 
         word.charAt(0).toUpperCase() + word.slice(1)

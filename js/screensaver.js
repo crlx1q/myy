@@ -7,6 +7,8 @@ import { setWakeLock, wakeLock, screenSleepTimer, setScreenSleepTimer, lastActiv
 import { pauseWeatherAnimation, resumeWeatherAnimation } from './weather.js';
 
 const SCREEN_SLEEP_PAUSE_REASON = 'screen-sleep';
+let burnInMoveTimer = null;
+let burnInProtectionMinutes = 5;
 
 // WAKE LOCK API (для Android)
 export async function requestWakeLock() {
@@ -246,6 +248,50 @@ export function setupScreensaverUnlock() {
     }, { passive: true });
 }
 
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function applyBurnInShift() {
+    const dashboardRoot = document.getElementById('dashboardView') || document.body;
+    if (!dashboardRoot) return;
+
+    const x = randomInt(-10, 10);
+    const y = randomInt(-10, 10);
+    dashboardRoot.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+function activateBurnInProtection() {
+    if (document.body.classList.contains('burnin-protection-active')) {
+        return;
+    }
+
+    document.body.classList.add('burnin-protection-active');
+    applyBurnInShift();
+    if (burnInMoveTimer) {
+        clearInterval(burnInMoveTimer);
+    }
+    burnInMoveTimer = setInterval(applyBurnInShift, 15000);
+}
+
+function deactivateBurnInProtection() {
+    document.body.classList.remove('burnin-protection-active');
+    const dashboardRoot = document.getElementById('dashboardView') || document.body;
+    if (dashboardRoot) {
+        dashboardRoot.style.transform = '';
+    }
+    if (burnInMoveTimer) {
+        clearInterval(burnInMoveTimer);
+        burnInMoveTimer = null;
+    }
+}
+
+export function configureBurnInProtection(minutes = 5) {
+    const parsed = Number(minutes);
+    burnInProtectionMinutes = Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
+}
+
 // Режим сна экрана
 export function createScreenSleepOverlay() {
     if (screenSleepOverlay) return screenSleepOverlay;
@@ -259,6 +305,7 @@ export function createScreenSleepOverlay() {
 }
 
 export function setupScreenSleep(minutes) {
+    configureBurnInProtection(minutes);
     clearScreenSleep();
     createScreenSleepOverlay();
 
@@ -268,6 +315,7 @@ export function setupScreenSleep(minutes) {
         if (screenSleepOverlay) {
             screenSleepOverlay.classList.add('hidden');
         }
+        deactivateBurnInProtection();
         resumeWeatherAnimation(SCREEN_SLEEP_PAUSE_REASON);
     };
 
@@ -277,18 +325,18 @@ export function setupScreenSleep(minutes) {
 
     setScreenSleepTimer(setInterval(() => {
         const inactiveTime = (Date.now() - lastActivityTime) / 1000 / 60;
-        if (inactiveTime >= minutes) {
-            // Экран заснул - показываем overlay и ставим анимации на паузу
-            if (screenSleepOverlay && screenSleepOverlay.classList.contains('hidden')) {
-                screenSleepOverlay.classList.remove('hidden');
-                pauseWeatherAnimation(SCREEN_SLEEP_PAUSE_REASON);
-            }
-        } else {
-            // Экран активен - скрываем overlay и возобновляем анимации
+        if (inactiveTime >= burnInProtectionMinutes) {
+            activateBurnInProtection();
+            pauseWeatherAnimation(SCREEN_SLEEP_PAUSE_REASON);
             if (screenSleepOverlay && !screenSleepOverlay.classList.contains('hidden')) {
                 screenSleepOverlay.classList.add('hidden');
-                resumeWeatherAnimation(SCREEN_SLEEP_PAUSE_REASON);
             }
+        } else {
+            deactivateBurnInProtection();
+            if (screenSleepOverlay && !screenSleepOverlay.classList.contains('hidden')) {
+                screenSleepOverlay.classList.add('hidden');
+            }
+            resumeWeatherAnimation(SCREEN_SLEEP_PAUSE_REASON);
         }
     }, 10000)); // Проверяем каждые 10 секунд для более быстрой реакции
 }
@@ -301,6 +349,7 @@ export function clearScreenSleep() {
     if (screenSleepOverlay) {
         screenSleepOverlay.classList.add('hidden');
     }
+    deactivateBurnInProtection();
     setLastActivityTime(Date.now());
     resumeWeatherAnimation(SCREEN_SLEEP_PAUSE_REASON);
 }

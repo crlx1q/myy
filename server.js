@@ -34,6 +34,8 @@ const WEATHER_REFRESH_INTERVAL = 600000; // 10 минут
 const STATUS_REFRESH_BATCH_SIZE = 6;
 const CAPABILITY_REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 часа
 const API_REQUEST_DELAY = 200; // Задержка между запросами к API (мс)
+const SMARTTHINGS_MAX_RETRIES = 2;
+const SMARTTHINGS_AUTH_COOLDOWN_MS = 15 * 60 * 1000;
 
 // Пути к файлам данных
 const DATA_DIR = path.join(__dirname, 'data');
@@ -74,8 +76,12 @@ let settings = {
     soundNotifications: true,
     voiceControlEnabled: false,
     voiceControlStart: '07:00',
-    voiceControlEnd: '23:00'
+    voiceControlEnd: '23:00',
+    dashboardPin: '',
+    requireDashboardPin: false
 };
+
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '651956';
 
 // Очереди и состояние обновлений устройств
 let deviceRefreshQueue = [];
@@ -86,6 +92,67 @@ let lastCapabilityRefresh = 0;
 let heavyRefreshInProgress = false;
 let lightRefreshInProgress = false;
 let weatherRefreshInProgress = false;
+let smartThingsAuthBlockedUntil = 0;
+
+
+function isNightModeActive(date = new Date()) {
+    const hour = date.getHours();
+    return hour >= 23 || hour < 8;
+}
+
+function getDisplaySleepMinutes(date = new Date()) {
+    return isNightModeActive(date) ? 30 : 5;
+}
+
+function canCallSmartThings() {
+    return Date.now() >= smartThingsAuthBlockedUntil;
+}
+
+function markSmartThingsAuthFailure() {
+    smartThingsAuthBlockedUntil = Date.now() + SMARTTHINGS_AUTH_COOLDOWN_MS;
+}
+
+async function smartThingsRequest(endpoint, options = {}, { allowAuthCooldown = true } = {}) {
+    if (!SMARTTHINGS_PAT) {
+        throw new Error('SMARTTHINGS_PAT не задан в переменных окружения');
+    }
+
+    if (allowAuthCooldown && !canCallSmartThings()) {
+        const waitSec = Math.ceil((smartThingsAuthBlockedUntil - Date.now()) / 1000);
+        throw new Error(`SmartThings API временно заблокирован после ошибки авторизации. Повтор через ${waitSec} сек.`);
+    }
+
+    const headers = {
+        'Authorization': `Bearer ${SMARTTHINGS_PAT}`,
+        ...(options.headers || {})
+    };
+
+    let lastResponse = null;
+    for (let attempt = 0; attempt <= SMARTTHINGS_MAX_RETRIES; attempt += 1) {
+        const response = await fetch(`${SMARTTHINGS_API_URL}${endpoint}`, {
+            ...options,
+            headers
+        });
+        lastResponse = response;
+
+        if (response.status === 401 || response.status === 403) {
+            markSmartThingsAuthFailure();
+            return response;
+        }
+
+        if (response.status !== 429 && response.status < 500) {
+            return response;
+        }
+
+        if (attempt < SMARTTHINGS_MAX_RETRIES) {
+            const retryDelay = (attempt + 1) * 1500;
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            continue;
+        }
+    }
+
+    return lastResponse;
+}
 
 // ==========================================
 // MIDDLEWARE (должен быть ДО определения роутов)
@@ -132,6 +199,71 @@ app.post('/api/settings', (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
+
+app.get('/api/display-config', (req, res) => {
+    const now = new Date();
+    const nightMode = isNightModeActive(now);
+    res.json({
+        nightMode,
+        sleepMinutes: getDisplaySleepMinutes(now),
+        movePixelsMin: 5,
+        movePixelsMax: 10
+    });
+});
+
+app.get('/api/dashboard/pin-config', (req, res) => {
+    res.json({ required: !!settings.requireDashboardPin });
+});
+
+app.post('/api/dashboard/unlock', (req, res) => {
+    const pin = String((req.body && req.body.pin) || '').trim();
+    if (!settings.requireDashboardPin) {
+        return res.json({ success: true });
+    }
+
+    if (!settings.dashboardPin) {
+        return res.status(400).json({ success: false, error: 'PIN не настроен в админке' });
+    }
+
+    if (pin === String(settings.dashboardPin)) {
+        return res.json({ success: true });
+    }
+
+    return res.status(401).json({ success: false, error: 'Неверный PIN' });
+});
+
+app.post('/api/admin/verify', (req, res) => {
+    const password = String((req.body && req.body.password) || '').trim();
+    if (password === ADMIN_PASSWORD) {
+        return res.json({ success: true });
+    }
+    return res.status(401).json({ success: false, error: 'Неверный пароль администратора' });
+});
+
+app.post('/api/admin/pin', (req, res) => {
+    const password = String((req.body && req.body.password) || '').trim();
+    if (password !== ADMIN_PASSWORD) {
+        return res.status(401).json({ success: false, error: 'Неверный пароль администратора' });
+    }
+
+    const requireDashboardPin = !!(req.body && req.body.requireDashboardPin);
+    const dashboardPin = String((req.body && req.body.dashboardPin) || '').trim();
+
+    if (requireDashboardPin && !dashboardPin) {
+        return res.status(400).json({ success: false, error: 'Введите PIN для включенной защиты' });
+    }
+
+    settings.requireDashboardPin = requireDashboardPin;
+    settings.dashboardPin = dashboardPin;
+    saveDataFile(SETTINGS_FILE, settings);
+
+    return res.json({
+        success: true,
+        requireDashboardPin: settings.requireDashboardPin
+    });
+});
+
 
 
 // API для управления устройством (включая цвет)
@@ -294,9 +426,8 @@ async function enrichDeviceCapabilities(device, { force = false } = {}) {
     let detailLoaded = false;
 
     try {
-        const deviceDetailResponse = await fetch(`${SMARTTHINGS_API_URL}/devices/${device.deviceId}`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` }
+        const deviceDetailResponse = await smartThingsRequest(`/devices/${device.deviceId}`, {
+            method: 'GET'
         });
 
         if (deviceDetailResponse.ok) {
@@ -343,9 +474,8 @@ async function enrichDeviceCapabilities(device, { force = false } = {}) {
 
 async function fetchDevicesList(includeCapabilities = false) {
     try {
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` }
+        const response = await smartThingsRequest('/devices', {
+            method: 'GET'
         });
 
         if (!response.ok) {
@@ -404,9 +534,8 @@ async function fetchDevicesList(includeCapabilities = false) {
 // Получение статуса здоровья устройства (онлайн/оффлайн)
 async function getDeviceHealth(deviceId) {
     try {
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices/${deviceId}/health`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` }
+        const response = await smartThingsRequest(`/devices/${deviceId}/health`, {
+            method: 'GET'
         });
         
         if (!response.ok) {
@@ -434,9 +563,8 @@ async function getDeviceStatus(deviceId) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд таймаут
         
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices/${deviceId}/status`, {
+        const response = await smartThingsRequest(`/devices/${deviceId}/status`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${SMARTTHINGS_PAT}` },
             signal: controller.signal
         });
         
@@ -619,14 +747,13 @@ async function controlDevice(deviceId, command, capability = 'switch', arguments
             };
         }
 
-        const response = await fetch(`${SMARTTHINGS_API_URL}/devices/${deviceId}/commands`, {
+        const response = await smartThingsRequest(`/devices/${deviceId}/commands`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${SMARTTHINGS_PAT}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
-        });
+        }, { allowAuthCooldown: false });
         
         if (!response.ok) {
             const errorText = await response.text();
@@ -1017,6 +1144,10 @@ io.on('connection', (socket) => {
 
 // Раздача статических файлов
 app.use(express.static(path.join(__dirname)));
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
 
 // Роут для проверки статуса сервера
 app.get('/api/status', (req, res) => {
@@ -1779,7 +1910,14 @@ app.get('/api/mini/data', (req, res) => {
         deviceStates: deviceStates,
         weather: weatherData,
         forecast: forecastData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        displayConfig: {
+            nightMode: isNightModeActive(),
+            sleepMinutes: getDisplaySleepMinutes(),
+            movePixelsMin: 5,
+            movePixelsMax: 10
+        },
+        pinRequired: !!settings.requireDashboardPin
     });
 });
 
@@ -1827,4 +1965,3 @@ server.listen(PORT, HOST, () => {
     console.log(`Сетевой доступ: http://${localIP}:${PORT}`);
     console.log(`Доступ по IP: http://192.168.100.13:${PORT} (если настроен)`);
 });
-
