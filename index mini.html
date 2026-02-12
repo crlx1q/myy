@@ -264,11 +264,33 @@
             padding: 15px 10px 60px 10px;
             overflow-y: auto;
         }
+
+        .devices-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
         
-        #page-devices h2 {
+        .devices-header h2 {
             font-size: 18px;
             color: #888;
-            margin-bottom: 10px;
+        }
+
+        .off-all-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background: #700;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .off-all-btn:active {
+            background: #900;
         }
         
         .devices-grid {
@@ -461,12 +483,14 @@
         </div>
         
         <button class="back-btn" onclick="showPage(0)">Назад</button>
-        <button class="back-btn" style="bottom: 70px; background:#700;" onclick="turnOffAllMiniDevices()">Выключить всё</button>
     </div>
     
     <!-- Страница устройств (свайп влево) -->
     <div class="page" id="page-devices">
-        <h2>Устройства</h2>
+        <div class="devices-header">
+            <h2>Устройства</h2>
+            <button class="off-all-btn" onclick="turnOffAllMiniDevices()">Выключить всё</button>
+        </div>
         <div id="devices-list">
             <div class="no-devices">Загрузка...</div>
         </div>
