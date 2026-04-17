@@ -1,6 +1,9 @@
 // Загружаем переменные окружения из .env файла (если есть)
 require('dotenv').config();
 
+// ── Авто-обновление SmartThings токена ────────────────────────────────────
+const { getCurrentToken, startAutoRefresh } = require('./token-manager');
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -133,8 +136,9 @@ function markSmartThingsAuthFailure() {
 }
 
 async function smartThingsRequest(endpoint, options = {}, { allowAuthCooldown = true } = {}) {
-    if (!SMARTTHINGS_PAT) {
-        throw new Error('SMARTTHINGS_PAT не задан в переменных окружения');
+    const activeToken = getCurrentToken();
+    if (!activeToken) {
+        throw new Error('Нет токена SmartThings. Задай SMARTTHINGS_PAT в .env или настрой OAuth (см. token-manager.js)');
     }
 
     if (allowAuthCooldown && !canCallSmartThings()) {
@@ -143,7 +147,7 @@ async function smartThingsRequest(endpoint, options = {}, { allowAuthCooldown = 
     }
 
     const headers = {
-        'Authorization': `Bearer ${SMARTTHINGS_PAT}`,
+        'Authorization': `Bearer ${activeToken}`,
         ...(options.headers || {})
     };
 
@@ -1964,6 +1968,8 @@ app.get('/api/mini/control', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0'; // Слушаем на всех интерфейсах для доступа по IP
 server.listen(PORT, HOST, () => {
+    // Запускаем авто-обновление токена SmartThings
+    startAutoRefresh();
     const os = require('os');
     const networkInterfaces = os.networkInterfaces();
     let localIP = 'localhost';
