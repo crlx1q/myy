@@ -1,7 +1,7 @@
 // Загружаем переменные окружения из .env файла (если есть)
 require('dotenv').config();
 
-// ── Авто-обновление SmartThings токена ────────────────────────────────────
+// Авто-обновление токена SmartThings
 const { getCurrentToken, startAutoRefresh } = require('./token-manager');
 
 const express = require('express');
@@ -132,13 +132,18 @@ function canCallSmartThings() {
 }
 
 function markSmartThingsAuthFailure() {
-    smartThingsAuthBlockedUntil = Date.now() + SMARTTHINGS_AUTH_COOLDOWN_MS;
+    // Если OAuth настроен — не блокируем надолго, токен обновится сам
+    const oauthEnabled = !!(process.env.ST_CLIENT_ID && process.env.ST_CLIENT_SECRET);
+    const cooldown = oauthEnabled
+        ? 60 * 1000                      // 1 минута — токен скоро обновится
+        : SMARTTHINGS_AUTH_COOLDOWN_MS;  // 15 минут — PAT надо менять вручную
+    smartThingsAuthBlockedUntil = Date.now() + cooldown;
 }
 
 async function smartThingsRequest(endpoint, options = {}, { allowAuthCooldown = true } = {}) {
     const activeToken = getCurrentToken();
     if (!activeToken) {
-        throw new Error('Нет токена SmartThings. Задай SMARTTHINGS_PAT в .env или настрой OAuth (см. token-manager.js)');
+        throw new Error('Нет токена SmartThings. Задай SMARTTHINGS_PAT в .env или настрой OAuth.');
     }
 
     if (allowAuthCooldown && !canCallSmartThings()) {
@@ -1968,8 +1973,7 @@ app.get('/api/mini/control', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0'; // Слушаем на всех интерфейсах для доступа по IP
 server.listen(PORT, HOST, () => {
-    // Запускаем авто-обновление токена SmartThings
-    startAutoRefresh();
+    startAutoRefresh(); // Запуск авто-обновления токена SmartThings
     const os = require('os');
     const networkInterfaces = os.networkInterfaces();
     let localIP = 'localhost';
