@@ -1,23 +1,26 @@
 // pat-refresher.js
-// Автоматически создаёт новый PAT токен SmartThings каждые 20 часов.
-// Использует Puppeteer (headless браузер) — никакого OAuth, никаких CLI.
+// Стратегия:
+//   1. Первый запуск — открывает браузер ВИДИМО, ты логинишься сам (2FA и всё такое)
+//   2. Куки сохраняются в data/samsung-cookies.json
+//   3. Все следующие запуски — используют куки, никакого 2FA
+//   4. Новый PAT создаётся каждые 20 часов автоматически
 //
-// Установка: npm install puppeteer
-// Запуск:    node pat-refresher.js  (или запускается автоматически из server.js)
+// Первый запуск (ты за компьютером):
+//   node pat-refresher.js --setup
+//
+// После этого просто перезапусти server.js — всё автоматически.
 
 require('dotenv').config();
 const fs   = require('fs');
 const path = require('path');
 
-const DATA_DIR   = path.join(__dirname, 'data');
-const TOKEN_FILE = path.join(DATA_DIR, 'st_pat.json');
-const ENV_FILE   = path.join(__dirname, '.env');
+const DATA_DIR      = path.join(__dirname, 'data');
+const COOKIES_FILE  = path.join(DATA_DIR, 'samsung-cookies.json');
+const TOKEN_FILE    = path.join(DATA_DIR, 'st_pat.json');
+const ENV_FILE      = path.join(__dirname, '.env');
+const REFRESH_MS    = 20 * 60 * 60 * 1000; // 20 часов
 
-const SAMSUNG_EMAIL    = process.env.SAMSUNG_EMAIL;
-const SAMSUNG_PASSWORD = process.env.SAMSUNG_PASSWORD;
-const REFRESH_INTERVAL = 20 * 60 * 60 * 1000; // 20 часов
-
-// ── Сохранить токен в файл и обновить .env ───────────────────
+// ── Сохранить PAT токен ───────────────────────────────────────
 function saveToken(token) {
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -29,19 +32,19 @@ function saveToken(token) {
     // Обновить SMARTTHINGS_PAT в .env
     if (fs.existsSync(ENV_FILE)) {
         let env = fs.readFileSync(ENV_FILE, 'utf8');
-        if (/^SMARTTHINGS_PAT=.*/m.test(env)) {
-            env = env.replace(/^SMARTTHINGS_PAT=.*/m, `SMARTTHINGS_PAT=${token}`);
-        } else {
-            env += `\nSMARTTHINGS_PAT=${token}`;
-        }
-        fs.writeFileSync(ENV_FILE, env);
+        env = /^SMARTTHINGS_PAT=.*/m.test(env)
+            ? env.replace(/^SMARTTHINGS_PAT=.*/m, `SMARTTHINGS_PAT=${token}`)
+            : env + `\nSMARTTHINGS_PAT=${token}`;
+        fs.writeFileSync(ENV_FILE, env.trim() + '\n');
     }
 
-    console.log(`[PAT Refresher] ✅ Новый токен сохранён: ${new Date().toISOString()}`);
+    // Обновляем токен в памяти чтобы server.js сразу его использовал
+    process.env.SMARTTHINGS_PAT = token;
+
+    console.log(`[PAT] ✅ Новый токен сохранён: ${new Date().toISOString()}`);
     return token;
 }
 
-// ── Загрузить текущий токен ───────────────────────────────────
 function loadToken() {
     try {
         if (fs.existsSync(TOKEN_FILE)) {
@@ -51,189 +54,236 @@ function loadToken() {
     return process.env.SMARTTHINGS_PAT || null;
 }
 
-// ── Создать новый PAT через Puppeteer ─────────────────────────
-async function createNewPAT() {
+function hasCookies() {
+    return fs.existsSync(COOKIES_FILE);
+}
+
+// ── Запустить Puppeteer ───────────────────────────────────────
+async function launchBrowser(headless) {
     let puppeteer;
     try {
         puppeteer = require('puppeteer');
     } catch {
-        console.error('[PAT Refresher] ❌ Puppeteer не установлен. Запусти: npm install puppeteer');
+        console.error('[PAT] ❌ Установи puppeteer: npm install puppeteer');
         process.exit(1);
     }
 
-    if (!SAMSUNG_EMAIL || !SAMSUNG_PASSWORD) {
-        console.error('[PAT Refresher] ❌ Задай SAMSUNG_EMAIL и SAMSUNG_PASSWORD в .env');
-        process.exit(1);
+    return puppeteer.launch({
+        headless: headless ? 'new' : false,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1024,768'],
+        defaultViewport: { width: 1024, height: 768 },
+    });
+}
+
+// ── SETUP: первый вход вручную, сохранение куков ──────────────
+async function setupLogin() {
+    console.log('\n' + '='.repeat(60));
+    console.log('  ПЕРВОНАЧАЛЬНАЯ НАСТРОЙКА');
+    console.log('='.repeat(60));
+    console.log('\n📌 Сейчас откроется браузер на сервере.');
+    console.log('   Если у тебя нет GUI на сервере — читай ниже.\n');
+    console.log('   Войди в Samsung аккаунт (email + пароль + 2FA).');
+    console.log('   Когда окажешься на странице токенов — вернись сюда');
+    console.log('   и нажми Enter.\n');
+
+    // Если нет дисплея — дать инструкцию
+    if (!process.env.DISPLAY && process.platform === 'linux') {
+        console.log('⚠️  Нет переменной DISPLAY (headless сервер).');
+        console.log('   Подключись через SSH с X11 forwarding:');
+        console.log('   ssh -X user@твой_сервер');
+        console.log('   Или запусти setup на своём компьютере, скопируй data/samsung-cookies.json на сервер.\n');
     }
 
-    console.log('[PAT Refresher] 🌐 Запускаю браузер...');
+    const browser = await launchBrowser(false);
+    const page    = await browser.newPage();
 
-    const browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    await page.setUserAgent(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+    );
+
+    await page.goto('https://account.smartthings.com/tokens', {
+        waitUntil: 'networkidle2',
+        timeout: 60000,
     });
 
-    try {
-        const page = await browser.newPage();
-        await page.setUserAgent(
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
-        );
+    console.log('⏳ Войди в браузере, затем нажми Enter здесь...');
+    await new Promise(resolve => {
+        process.stdin.setRawMode?.(false);
+        process.stdin.resume();
+        process.stdin.once('data', () => {
+            process.stdin.pause();
+            resolve();
+        });
+        process.stdout.write('> ');
+    });
 
-        // ── 1. Открыть страницу токенов ───────────────────────
-        console.log('[PAT Refresher] 📂 Открываю account.smartthings.com/tokens...');
+    const currentUrl = page.url();
+    if (!currentUrl.includes('smartthings.com/tokens')) {
+        console.warn('[PAT] ⚠️  URL не совпадает:', currentUrl);
+        console.warn('   Убедись что ты на странице https://account.smartthings.com/tokens');
+    }
+
+    const cookies = await page.cookies();
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(COOKIES_FILE, JSON.stringify(cookies, null, 2));
+
+    console.log(`\n[PAT] ✅ Куки сохранены (${cookies.length} шт.) → ${COOKIES_FILE}`);
+    await browser.close();
+
+    console.log('\n[PAT] 🔧 Создаю первый PAT токен...');
+    const token = await createPAT();
+
+    if (token) {
+        console.log('\n' + '='.repeat(60));
+        console.log('🎉 Настройка завершена!');
+        console.log('   Перезапусти сервер: pm2 restart all');
+        console.log('   Токен будет обновляться автоматически каждые 20ч.');
+        console.log('='.repeat(60) + '\n');
+    }
+}
+
+// ── Создать PAT используя сохранённые куки ────────────────────
+async function createPAT() {
+    if (!hasCookies()) {
+        console.error('[PAT] ❌ Нет куков. Запусти: node pat-refresher.js --setup');
+        return null;
+    }
+
+    const browser = await launchBrowser(true);
+    const page    = await browser.newPage();
+
+    await page.setUserAgent(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+    );
+
+    try {
+        const cookies = JSON.parse(fs.readFileSync(COOKIES_FILE, 'utf8'));
+        await page.setCookie(...cookies);
+
+        console.log('[PAT] 🌐 Открываю страницу токенов...');
         await page.goto('https://account.smartthings.com/tokens', {
             waitUntil: 'networkidle2',
             timeout: 30000,
         });
 
-        // ── 2. Войти в Samsung аккаунт ────────────────────────
-        console.log('[PAT Refresher] 🔑 Вхожу в Samsung аккаунт...');
-
-        // Ввести email
-        await page.waitForSelector('input[type="email"], input[name="email"], #id-email-input', { timeout: 15000 });
-        await page.type('input[type="email"], input[name="email"], #id-email-input', SAMSUNG_EMAIL, { delay: 50 });
-
-        // Нажать продолжить / next
-        const nextBtn = await page.$('button[type="submit"], #btnNext, .btn-next');
-        if (nextBtn) await nextBtn.click();
-        await page.waitForTimeout(2000);
-
-        // Ввести пароль
-        await page.waitForSelector('input[type="password"]', { timeout: 10000 });
-        await page.type('input[type="password"]', SAMSUNG_PASSWORD, { delay: 50 });
-
-        // Нажать войти
-        await Promise.all([
-            page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
-            page.click('button[type="submit"], #btnSignIn, .btn-signin, button:has-text("Sign in")'),
-        ]);
-
-        console.log('[PAT Refresher] ✅ Вошёл в аккаунт');
-
-        // Убедимся что мы на странице токенов
-        if (!page.url().includes('smartthings.com/tokens')) {
-            await page.goto('https://account.smartthings.com/tokens', {
-                waitUntil: 'networkidle2',
-                timeout: 20000,
-            });
+        // Сессия истекла?
+        if (page.url().includes('login') || page.url().includes('signin') || page.url().includes('account.samsung')) {
+            console.error('[PAT] ⚠️  Сессия истекла — нужно повторить setup.');
+            console.error('     Запусти: node pat-refresher.js --setup');
+            await browser.close();
+            return null;
         }
 
-        // ── 3. Нажать "Generate new token" ───────────────────
-        console.log('[PAT Refresher] 🔧 Создаю новый токен...');
-        await page.waitForSelector('button, a', { timeout: 10000 });
+        // Обновляем куки
+        const updatedCookies = await page.cookies();
+        fs.writeFileSync(COOKIES_FILE, JSON.stringify(updatedCookies, null, 2));
 
-        // Ищем кнопку генерации
-        await page.evaluate(() => {
+        // Нажать "Generate new token"
+        console.log('[PAT] 🔧 Нажимаю Generate new token...');
+        const clicked = await page.evaluate(() => {
             const btns = [...document.querySelectorAll('button, a')];
-            const btn  = btns.find(b => b.textContent.includes('Generate') || b.textContent.includes('generate'));
-            if (btn) btn.click();
+            const btn  = btns.find(b =>
+                b.textContent.toLowerCase().includes('generate') ||
+                b.textContent.toLowerCase().includes('create') ||
+                b.textContent.toLowerCase().includes('new token')
+            );
+            if (btn) { btn.click(); return true; }
+            return false;
         });
 
-        await page.waitForTimeout(2000);
+        if (!clicked) {
+            await page.screenshot({ path: path.join(DATA_DIR, 'debug-no-button.png') });
+            throw new Error('Кнопка Generate не найдена. Скриншот: data/debug-no-button.png');
+        }
 
-        // ── 4. Заполнить имя токена ───────────────────────────
-        const nameInput = await page.$('input[placeholder*="name"], input[placeholder*="Name"], input[name="name"]');
+        await new Promise(r => setTimeout(r, 2000));
+
+        // Имя токена
+        const nameInput = await page.$('input[type="text"], input[name="name"], input[placeholder]');
         if (nameInput) {
             await nameInput.click({ clickCount: 3 });
             await nameInput.type(`smart-home-${Date.now()}`);
         }
 
-        // ── 5. Выбрать все нужные scopes ─────────────────────
-        const scopes = [
-            'Devices', 'Locations', 'Scenes', 'Rules',
-            'r:devices', 'w:devices', 'x:devices',
-            'r:locations', 'r:scenes', 'x:scenes',
-        ];
-
-        await page.evaluate((scopeList) => {
+        // Выбрать все scopes
+        await page.evaluate(() => {
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                const label = cb.closest('label')?.textContent || cb.getAttribute('aria-label') || cb.name || '';
-                const match = scopeList.some(s => label.toLowerCase().includes(s.toLowerCase()));
-                if (match && !cb.checked) cb.click();
+                if (!cb.checked) cb.click();
             });
-        }, scopes);
+        });
 
-        // ── 6. Нажать Generate ────────────────────────────────
+        await new Promise(r => setTimeout(r, 500));
+
+        // Нажать финальный Generate
         await page.evaluate(() => {
             const btns = [...document.querySelectorAll('button')];
             const btn  = btns.find(b =>
-                b.textContent.trim().toLowerCase().includes('generate') &&
-                !b.disabled
+                b.textContent.trim().toLowerCase().includes('generate') && !b.disabled
             );
             if (btn) btn.click();
         });
 
-        await page.waitForTimeout(3000);
+        await new Promise(r => setTimeout(r, 3000));
 
-        // ── 7. Получить токен со страницы ─────────────────────
+        // Извлечь токен
         const token = await page.evaluate(() => {
-            // Ищем токен в разных местах
-            const codeEl = document.querySelector('code, .token-value, [class*="token"], pre');
-            if (codeEl) return codeEl.textContent.trim();
-
-            // Ищем UUID-подобную строку в тексте
-            const bodyText = document.body.innerText;
-            const uuidMatch = bodyText.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-            return uuidMatch ? uuidMatch[0] : null;
+            for (const sel of ['code', 'pre', '.token-value', '[class*="token"]', '[class*="Token"]']) {
+                const el = document.querySelector(sel);
+                if (el && el.textContent.trim().length > 20) return el.textContent.trim();
+            }
+            const match = document.body.innerText.match(
+                /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+            );
+            return match ? match[0] : null;
         });
 
         if (!token) {
-            // Сделать скриншот для отладки
-            await page.screenshot({ path: path.join(DATA_DIR, 'debug-screenshot.png') });
-            throw new Error('Не удалось найти токен на странице. Скриншот: data/debug-screenshot.png');
+            await page.screenshot({ path: path.join(DATA_DIR, 'debug-no-token.png') });
+            throw new Error('Токен не найден. Скриншот: data/debug-no-token.png');
         }
 
-        console.log(`[PAT Refresher] 🎉 Токен получен: ${token.slice(0, 8)}...`);
+        await browser.close();
         return saveToken(token);
 
-    } finally {
-        await browser.close();
+    } catch (e) {
+        try { await browser.close(); } catch {}
+        throw e;
     }
 }
 
-// ── Экспорт для использования в server.js ────────────────────
+// ── Экспорт для server.js ─────────────────────────────────────
 function getCurrentToken() {
     return loadToken();
 }
 
 async function startAutoRefresh() {
-    if (!SAMSUNG_EMAIL || !SAMSUNG_PASSWORD) {
-        console.warn('[PAT Refresher] ⚠️  SAMSUNG_EMAIL / SAMSUNG_PASSWORD не заданы в .env');
-        console.warn('[PAT Refresher]    Используется текущий SMARTTHINGS_PAT (истечёт через 24ч)');
+    if (!hasCookies()) {
+        console.warn('[PAT] ⚠️  Куки не найдены. Запусти: node pat-refresher.js --setup');
         return;
     }
 
-    // Первое обновление сразу при старте
-    try {
-        await createNewPAT();
-    } catch (e) {
-        console.error('[PAT Refresher] Ошибка первого обновления:', e.message);
-    }
+    console.log('[PAT] 🔄 Авто-обновление PAT запущено (каждые 20ч)');
 
-    // Потом каждые 20 часов
+    try { await createPAT(); }
+    catch (e) { console.error('[PAT] Ошибка первого обновления:', e.message); }
+
     setInterval(async () => {
-        try {
-            await createNewPAT();
-        } catch (e) {
-            console.error('[PAT Refresher] Ошибка обновления токена:', e.message);
-        }
-    }, REFRESH_INTERVAL);
-
-    console.log('[PAT Refresher] 🔄 Авто-обновление PAT запущено (каждые 20ч)');
+        try { await createPAT(); }
+        catch (e) { console.error('[PAT] Ошибка авто-обновления:', e.message); }
+    }, REFRESH_MS);
 }
 
 module.exports = { getCurrentToken, startAutoRefresh };
 
-// ── Если запущен напрямую (node pat-refresher.js) ────────────
+// ── Прямой запуск ─────────────────────────────────────────────
 if (require.main === module) {
-    createNewPAT()
-        .then(token => {
-            console.log('\n✅ Готово! Токен сохранён в data/st_pat.json и обновлён в .env');
-            console.log(`   Токен: ${token.slice(0, 8)}...`);
-            process.exit(0);
-        })
-        .catch(e => {
-            console.error('❌ Ошибка:', e.message);
-            process.exit(1);
-        });
+    const isSetup = process.argv.includes('--setup');
+
+    if (isSetup) {
+        setupLogin().catch(e => { console.error('❌', e.message); process.exit(1); });
+    } else {
+        createPAT()
+            .then(t => { console.log(t ? '✅ Токен обновлён.' : '⚠️  Нужен --setup'); process.exit(0); })
+            .catch(e => { console.error('❌', e.message); process.exit(1); });
+    }
 }
