@@ -5,29 +5,26 @@
 // ============================================================
 
 require('dotenv').config();
-const http    = require('http');
 const https   = require('https');
 const fs      = require('fs');
 const path    = require('path');
-const { execSync } = require('child_process');
+const readline = require('readline');
 
-// ── Конфиг ───────────────────────────────────────────────────
-const REDIRECT_PORT = 9876;
-const REDIRECT_URI  = `http://localhost:${REDIRECT_PORT}`;
-const DATA_DIR      = path.join(__dirname, 'data');
-const TOKENS_FILE   = path.join(DATA_DIR, 'st_tokens.json');
-const CREDS_FILE    = path.join(DATA_DIR, 'st_oauth_creds.json');
-const SCOPES        = [
+const REDIRECT_URI = 'https://httpbin.org/get'; // HTTPS — Samsung принимает
+const DATA_DIR     = path.join(__dirname, 'data');
+const TOKENS_FILE  = path.join(DATA_DIR, 'st_tokens.json');
+const CREDS_FILE   = path.join(DATA_DIR, 'st_oauth_creds.json');
+const ENV_FILE     = path.join(__dirname, '.env');
+const SCOPES       = [
     'r:devices:*', 'w:devices:*', 'x:devices:*',
-    'r:locations:*', 'w:locations:*',
-    'r:scenes:*',   'x:scenes:*',
-    'r:rules:*',    'w:rules:*',
+    'r:locations:*', 'r:scenes:*', 'x:scenes:*',
+    'r:rules:*', 'w:rules:*',
 ].join(' ');
 
 // ── Аргументы ─────────────────────────────────────────────────
-const args = process.argv.slice(2);
+const args   = process.argv.slice(2);
 const patIdx = args.indexOf('--pat');
-const PAT = patIdx !== -1 ? args[patIdx + 1] : process.env.SMARTTHINGS_PAT;
+const PAT    = patIdx !== -1 ? args[patIdx + 1] : process.env.SMARTTHINGS_PAT;
 
 if (!PAT) {
     console.error('\n❌ Укажи PAT токен:');
@@ -36,35 +33,35 @@ if (!PAT) {
 }
 
 // ── Утилиты ───────────────────────────────────────────────────
-function log(msg)  { console.log(`\n✅ ${msg}`); }
-function info(msg) { console.log(`   ${msg}`); }
-function err(msg)  { console.error(`\n❌ ${msg}`); }
+function ask(question) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    return new Promise(resolve => rl.question(question, ans => { rl.close(); resolve(ans.trim()); }));
+}
 
-async function apiCall(method, url, body, authToken) {
+async function apiPost(url, body, headers = {}) {
     return new Promise((resolve, reject) => {
-        const parsed   = new URL(url);
-        const bodyStr  = body ? JSON.stringify(body) : null;
-        const options  = {
+        const bodyStr = JSON.stringify(body);
+        const parsed  = new URL(url);
+        const req = https.request({
             hostname: parsed.hostname,
-            path:     parsed.pathname + parsed.search,
-            method,
-            headers: {
-                'Authorization': `Bearer ${authToken || PAT}`,
+            path:     parsed.pathname,
+            method:   'POST',
+            headers:  {
+                'Authorization': `Bearer ${PAT}`,
                 'Content-Type':  'application/json',
-                ...(bodyStr ? { 'Content-Length': Buffer.byteLength(bodyStr) } : {}),
+                'Content-Length': Buffer.byteLength(bodyStr),
+                ...headers,
             },
-        };
-
-        const req = https.request(options, res => {
+        }, res => {
             let data = '';
-            res.on('data', chunk => data += chunk);
+            res.on('data', c => data += c);
             res.on('end',  () => {
                 try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
                 catch { resolve({ status: res.statusCode, body: data }); }
             });
         });
         req.on('error', reject);
-        if (bodyStr) req.write(bodyStr);
+        req.write(bodyStr);
         req.end();
     });
 }
@@ -73,19 +70,17 @@ async function formPost(url, params) {
     return new Promise((resolve, reject) => {
         const bodyStr = new URLSearchParams(params).toString();
         const parsed  = new URL(url);
-        const options = {
+        const req = https.request({
             hostname: parsed.hostname,
             path:     parsed.pathname,
             method:   'POST',
-            headers: {
+            headers:  {
                 'Content-Type':   'application/x-www-form-urlencoded',
                 'Content-Length': Buffer.byteLength(bodyStr),
             },
-        };
-
-        const req = https.request(options, res => {
+        }, res => {
             let data = '';
-            res.on('data', chunk => data += chunk);
+            res.on('data', c => data += c);
             res.on('end',  () => {
                 try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
                 catch { resolve({ status: res.statusCode, body: data }); }
@@ -99,21 +94,19 @@ async function formPost(url, params) {
 
 // ── Шаг 1: Создать OAuth приложение ───────────────────────────
 async function createApp() {
-    // Если уже есть сохранённые credentials — пропускаем
     if (fs.existsSync(CREDS_FILE)) {
         const creds = JSON.parse(fs.readFileSync(CREDS_FILE, 'utf8'));
-        log('OAuth приложение уже создано, используем сохранённые данные');
-        info(`Client ID: ${creds.clientId}`);
+        console.log('\n✅ OAuth приложение уже создано');
+        console.log(`   Client ID: ${creds.clientId}`);
         return creds;
     }
 
-    console.log('\n🔧 Создаю OAuth приложение в SmartThings...');
+    console.log('\n🔧 Создаю OAuth приложение...');
 
-    const appName = `smart-home-${Date.now()}`;
-    const res = await apiCall('POST', 'https://api.smartthings.com/v1/apps', {
-        appName,
-        displayName:     'Smart Home OAuth',
-        description:     'Автоматическое OAuth приложение для умного дома',
+    const res = await apiPost('https://api.smartthings.com/v1/apps', {
+        appName:         `smart-home-${Date.now()}`,
+        displayName:     'Smart Home',
+        description:     'Умный дом',
         appType:         'API_ONLY',
         classifications: ['AUTOMATION'],
         apiOnly:         {},
@@ -125,7 +118,7 @@ async function createApp() {
     });
 
     if (res.status !== 200 && res.status !== 201) {
-        err(`Ошибка создания приложения: HTTP ${res.status}`);
+        console.error(`\n❌ Ошибка создания приложения (HTTP ${res.status}):`);
         console.error(JSON.stringify(res.body, null, 2));
         process.exit(1);
     }
@@ -134,24 +127,23 @@ async function createApp() {
     const clientSecret = res.body?.oauthClientSecret || res.body?.app?.oauthClientSecret;
 
     if (!clientId || !clientSecret) {
-        err('Не удалось получить Client ID / Secret из ответа:');
+        console.error('\n❌ Не получил Client ID / Secret. Ответ:');
         console.error(JSON.stringify(res.body, null, 2));
         process.exit(1);
     }
 
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    const creds = { clientId, clientSecret, appName };
+    const creds = { clientId, clientSecret };
     fs.writeFileSync(CREDS_FILE, JSON.stringify(creds, null, 2));
 
-    log('Приложение создано!');
-    info(`Client ID:     ${clientId}`);
-    info(`Client Secret: ${clientSecret.slice(0, 8)}...`);
-    info(`Сохранено в:   ${CREDS_FILE}`);
+    console.log('✅ Приложение создано!');
+    console.log(`   Client ID:     ${clientId}`);
+    console.log(`   Client Secret: ${clientSecret.slice(0, 8)}...`);
 
     return creds;
 }
 
-// ── Шаг 2: Авторизация — ловим код через локальный сервер ─────
+// ── Шаг 2: Авторизация через браузер ─────────────────────────
 async function getAuthCode(clientId) {
     const authUrl =
         `https://api.smartthings.com/oauth/authorize` +
@@ -160,60 +152,29 @@ async function getAuthCode(clientId) {
         `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
         `&scope=${encodeURIComponent(SCOPES)}`;
 
-    console.log('\n🌐 Нужна одноразовая авторизация в браузере.');
-    console.log('   Открой эту ссылку на своём компьютере/телефоне:\n');
-    console.log(`   ${authUrl}\n`);
-    console.log('   Войди в Samsung аккаунт и разреши доступ.');
-    console.log(`   Сервер ждёт ответа на порту ${REDIRECT_PORT}...`);
+    console.log('\n' + '='.repeat(60));
+    console.log('🌐 ОТКРОЙ ЭТУ ССЫЛКУ В БРАУЗЕРЕ (на телефоне или компе):');
+    console.log('='.repeat(60));
+    console.log('\n' + authUrl + '\n');
+    console.log('='.repeat(60));
+    console.log('\n📌 Войди в Samsung аккаунт и разреши доступ.');
+    console.log('   Тебя перекинет на httpbin.org — это нормально!');
+    console.log('   На той странице найди поле "code" в JSON и скопируй его значение.\n');
+    console.log('   Пример того что увидишь:');
+    console.log('   {');
+    console.log('     "args": {');
+    console.log('       "code": "XXXXXX",   <-- вот это копируй');
+    console.log('     }');
+    console.log('   }\n');
 
-    // Попробуем открыть браузер если возможно
-    try { execSync(`xdg-open "${authUrl}" 2>/dev/null`); } catch {}
+    const code = await ask('   Вставь сюда код: ');
 
-    return new Promise((resolve, reject) => {
-        const server = http.createServer((req, res) => {
-            const url    = new URL(req.url, `http://localhost:${REDIRECT_PORT}`);
-            const code   = url.searchParams.get('code');
-            const errMsg = url.searchParams.get('error');
+    if (!code || code.length < 3) {
+        console.error('❌ Код не введён. Попробуй снова.');
+        process.exit(1);
+    }
 
-            if (errMsg) {
-                res.end('<h2>Ошибка авторизации. Закрой вкладку.</h2>');
-                server.close();
-                reject(new Error(`OAuth ошибка: ${errMsg}`));
-                return;
-            }
-
-            if (code) {
-                res.end(`
-                    <html><body style="font-family:sans-serif;padding:40px;text-align:center">
-                    <h2>✅ Авторизация успешна!</h2>
-                    <p>Можно закрыть эту вкладку — сервер продолжает настройку.</p>
-                    </body></html>
-                `);
-                server.close();
-                resolve(code);
-            } else {
-                res.end('<h2>Нет кода. Попробуй снова.</h2>');
-            }
-        });
-
-        server.listen(REDIRECT_PORT, () => {
-            // Просто ждём
-        });
-
-        server.on('error', e => {
-            if (e.code === 'EADDRINUSE') {
-                reject(new Error(`Порт ${REDIRECT_PORT} занят. Освободи его и попробуй снова.`));
-            } else {
-                reject(e);
-            }
-        });
-
-        // Таймаут 5 минут
-        setTimeout(() => {
-            server.close();
-            reject(new Error('Таймаут ожидания авторизации (5 мин). Запусти скрипт снова.'));
-        }, 5 * 60 * 1000);
-    });
+    return code;
 }
 
 // ── Шаг 3: Обменять код на токены ────────────────────────────
@@ -229,7 +190,7 @@ async function exchangeCode(code, clientId, clientSecret) {
     });
 
     if (res.status !== 200 || !res.body.access_token) {
-        err(`Ошибка получения токенов: HTTP ${res.status}`);
+        console.error(`\n❌ Ошибка получения токенов (HTTP ${res.status}):`);
         console.error(JSON.stringify(res.body, null, 2));
         process.exit(1);
     }
@@ -237,60 +198,47 @@ async function exchangeCode(code, clientId, clientSecret) {
     return res.body;
 }
 
-// ── Шаг 4: Сохранить токены и обновить .env ───────────────────
+// ── Шаг 4: Сохранить всё ─────────────────────────────────────
 function saveResults(tokens, creds) {
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-    // Сохранить токены
-    const tokenData = {
+    fs.writeFileSync(TOKENS_FILE, JSON.stringify({
         access_token:  tokens.access_token,
         refresh_token: tokens.refresh_token,
         updated_at:    new Date().toISOString(),
-    };
-    fs.writeFileSync(TOKENS_FILE, JSON.stringify(tokenData, null, 2));
+    }, null, 2));
 
     // Обновить .env
-    const envFile = path.join(__dirname, '.env');
-    let envContent = fs.existsSync(envFile) ? fs.readFileSync(envFile, 'utf8') : '';
-
-    const setEnvVar = (content, key, value) => {
-        const regex = new RegExp(`^${key}=.*$`, 'm');
-        return regex.test(content)
-            ? content.replace(regex, `${key}=${value}`)
-            : content + `\n${key}=${value}`;
+    let env = fs.existsSync(ENV_FILE) ? fs.readFileSync(ENV_FILE, 'utf8') : '';
+    const set = (content, key, val) => {
+        const re = new RegExp(`^${key}=.*$`, 'm');
+        return re.test(content) ? content.replace(re, `${key}=${val}`) : content + `\n${key}=${val}`;
     };
+    env = set(env, 'ST_CLIENT_ID',     creds.clientId);
+    env = set(env, 'ST_CLIENT_SECRET', creds.clientSecret);
+    fs.writeFileSync(ENV_FILE, env.trim() + '\n');
 
-    envContent = setEnvVar(envContent, 'ST_CLIENT_ID',     creds.clientId);
-    envContent = setEnvVar(envContent, 'ST_CLIENT_SECRET', creds.clientSecret);
-
-    fs.writeFileSync(envFile, envContent.trim() + '\n');
-
-    log('Всё готово!');
-    info(`Токены сохранены: ${TOKENS_FILE}`);
-    info(`.env обновлён с ST_CLIENT_ID и ST_CLIENT_SECRET`);
-    info('Теперь перезапусти сервер: pm2 restart all  (или node server.js)');
-
-    console.log('\n' + '='.repeat(55));
-    console.log('🏠 Умный дом будет работать без перебоев навсегда!');
-    console.log('   token-manager.js обновляет токен каждые 20 часов.');
-    console.log('='.repeat(55) + '\n');
+    console.log('\n' + '='.repeat(60));
+    console.log('🎉 Всё готово!');
+    console.log(`   Токены сохранены:  ${TOKENS_FILE}`);
+    console.log(`   .env обновлён:     ST_CLIENT_ID, ST_CLIENT_SECRET`);
+    console.log('\n   Перезапусти сервер — токен будет жить вечно! 🏠');
+    console.log('='.repeat(60) + '\n');
 }
 
 // ── Главная функция ───────────────────────────────────────────
 async function main() {
-    console.log('\n' + '='.repeat(55));
+    console.log('\n' + '='.repeat(60));
     console.log('   SmartThings OAuth — автоматическая настройка');
-    console.log('='.repeat(55));
+    console.log('='.repeat(60));
 
     try {
-        const creds = await createApp();
+        const creds  = await createApp();
         const code   = await getAuthCode(creds.clientId);
-        log(`Код получен: ${code.slice(0, 6)}...`);
         const tokens = await exchangeCode(code, creds.clientId, creds.clientSecret);
-        log('Токены получены!');
         saveResults(tokens, creds);
     } catch (e) {
-        err(e.message);
+        console.error('\n❌ Ошибка:', e.message);
         process.exit(1);
     }
 }
