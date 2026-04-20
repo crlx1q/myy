@@ -112,10 +112,11 @@ async function createApp() {
     const appName = `smart-home-${Date.now()}`;
     const res = await apiCall('POST', 'https://api.smartthings.com/v1/apps', {
         appName,
-        displayName:  'Smart Home OAuth',
-        description:  'Автоматическое OAuth приложение для умного дома',
-        appType:      'API_ONLY',
-        apiOnly:      {},
+        displayName:     'Smart Home OAuth',
+        description:     'Автоматическое OAuth приложение для умного дома',
+        appType:         'API_ONLY',
+        classifications: ['AUTOMATION'],
+        apiOnly:         {},
         oauth: {
             clientName:   'smart-home',
             scope:        SCOPES.split(' '),
