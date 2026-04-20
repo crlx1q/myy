@@ -66,7 +66,7 @@ async function apiPost(url, body, headers = {}) {
     });
 }
 
-async function formPost(url, params) {
+async function formPost(url, params, basicAuthStr = null) {
     return new Promise((resolve, reject) => {
         const bodyStr = new URLSearchParams(params).toString();
         const parsed  = new URL(url);
@@ -77,6 +77,7 @@ async function formPost(url, params) {
             headers:  {
                 'Content-Type':   'application/x-www-form-urlencoded',
                 'Content-Length': Buffer.byteLength(bodyStr),
+                ...(basicAuthStr ? { 'Authorization': 'Basic ' + Buffer.from(basicAuthStr).toString('base64') } : {}),
             },
         }, res => {
             let data = '';
@@ -187,7 +188,7 @@ async function exchangeCode(code, clientId, clientSecret) {
         client_id:     clientId,
         client_secret: clientSecret,
         redirect_uri:  REDIRECT_URI,
-    });
+    }, `${clientId}:${clientSecret}`);
 
     if (res.status !== 200 || !res.body.access_token) {
         console.error(`\n❌ Ошибка получения токенов (HTTP ${res.status}):`);
