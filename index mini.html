@@ -11,9 +11,8 @@
             box-sizing: border-box;
             -webkit-box-sizing: border-box;
         }
-        
         body {
-            background: #000;
+            background-color: #000;
             color: #fff;
             font-family: Arial, Helvetica, sans-serif;
             overflow: hidden;
@@ -21,6 +20,7 @@
             height: 100%;
             position: fixed;
             font-size: 14px;
+            transition: background 2s ease;
         }
         
         /* Статус бар */
@@ -103,60 +103,27 @@
             padding: 10px;
         }
         
-        .weather-top {
-            display: table;
-            width: 100%;
-            margin-bottom: 30px;
-        }
+        /* Layout States для цикличной смены */
+        .dash-box { position: absolute; text-align: center; }
         
-        .weather-top-side {
-            display: table-cell;
-            width: 50%;
-            text-align: center;
-            padding: 5px;
-            vertical-align: top;
-        }
+        /* Позиции слотов */
+        .slot-tl { top: 15px; left: 10px; width: 45%; }
+        .slot-tr { top: 15px; right: 10px; width: 45%; }
+        .slot-center { top: 50%; left: 0; right: 0; width: 100%; margin-top: -65px; } /* Центрируем по вертикали */
         
-        .weather-top-label {
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 3px;
-        }
-        
-        .weather-top-temp {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-        
-        .weather-top-humidity {
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .clock-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            margin-top: -80px;
-            margin-left: -50%;
-            text-align: center;
-        }
-        
-        .clock-time {
-            font-size: 120px;
-            font-weight: bold;
-            line-height: 1;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .clock-date {
-            font-size: 18px;
-            color: #888;
-            text-align: center;
-        }
+        /* Размеры шрифтов внутри центрального слота (крупные) */
+        .slot-center .time-text { font-size: 110px; font-weight: bold; line-height: 1; margin-bottom: 5px; }
+        .slot-center .date-text { font-size: 20px; color: #888; }
+        .slot-center .temp-text { font-size: 90px; font-weight: bold; margin-bottom: 0px; line-height: 1;}
+        .slot-center .hum-text { font-size: 24px; color: #666; }
+        .slot-center .label-text { font-size: 20px; color: #888; margin-bottom: 5px; }
+
+        /* Размеры шрифтов внутри верхних слотов (мелкие) */
+        .slot-tl .time-text, .slot-tr .time-text { font-size: 38px; font-weight: bold; margin-bottom: 2px;}
+        .slot-tl .date-text, .slot-tr .date-text { font-size: 11px; color: #888; padding-top:2px;}
+        .slot-tl .temp-text, .slot-tr .temp-text { font-size: 28px; font-weight: bold; margin-bottom: 0px; }
+        .slot-tl .hum-text, .slot-tr .hum-text { font-size: 12px; color: #666; }
+        .slot-tl .label-text, .slot-tr .label-text { font-size: 11px; color: #888; margin-bottom: 3px; }
         
         /* Свайп подсказка */
         .swipe-hint {
@@ -354,6 +321,21 @@
             color: #666;
             padding: 30px;
         }
+
+        /* Погодные фоны */
+        body.weather-rain { background-color: #001533 !important; }
+        body.weather-snow { background-color: #222233 !important; }
+        body.weather-clear { background-color: #251800 !important; }
+        body.weather-clouds { background-color: #1a1f26 !important; }
+        body.weather-storm { background-color: #250a33 !important; }
+
+        /* Специфичные датчики */
+        .device.contact-open { border-color: #f00; background: #2a0000; }
+        .device.contact-open .device-icon { color: #f00; }
+        .device.contact-closed { border-color: #0c0; background: #0a1a00; }
+        .device.contact-closed .device-icon { color: #0c0; }
+        .device.temp-sensor { border-color: #08f; background: #00112a; }
+        .device.temp-sensor .device-icon { color: #08f; font-size: 26px; }
         
         /* Кнопка назад */
         .back-btn {
@@ -453,24 +435,22 @@
 
     <!-- Страница часов и погоды (главная) -->
     <div class="page active" id="page-clock">
-        <!-- Погода сверху: снаружи и дома -->
-        <div class="weather-top">
-            <div class="weather-top-side">
-                <div class="weather-top-label">Снаружи</div>
-                <div class="weather-top-temp" id="top-outside-temp">--°C</div>
-                <div class="weather-top-humidity" id="top-outside-humidity">--%</div>
-            </div>
-            <div class="weather-top-side">
-                <div class="weather-top-label">Дома</div>
-                <div class="weather-top-temp" id="top-inside-temp">--°C</div>
-                <div class="weather-top-humidity" id="top-inside-humidity">--%</div>
-            </div>
+        <!-- Динамические блоки главной страницы (Часы, Улица, Дом) -->
+        <div id="box-clock" class="dash-box slot-center">
+            <div class="time-text" id="clock-time">00:00</div>
+            <div class="date-text" id="clock-date">загрузка...</div>
         </div>
         
-        <!-- Часы -->
-        <div class="clock-container">
-            <div class="clock-time" id="clock-time">00:00</div>
-            <div class="clock-date" id="clock-date">загрузка...</div>
+        <div id="box-weather-out" class="dash-box slot-tl">
+            <div class="label-text" id="weather-description">Снаружи</div>
+            <div class="temp-text" id="top-outside-temp">--°C</div>
+            <div class="hum-text" id="top-outside-humidity">--%</div>
+        </div>
+        
+        <div id="box-weather-in" class="dash-box slot-tr">
+            <div class="label-text">Дома</div>
+            <div class="temp-text" id="top-inside-temp">--°C</div>
+            <div class="hum-text" id="top-inside-humidity">--%</div>
         </div>
         
         <div class="swipe-hint">Свайп вправо → прогноз | Свайп влево → устройства</div>
@@ -578,9 +558,24 @@ function updateWeather() {
     // Верхняя часть - снаружи
     if (weatherData) {
         $('top-outside-temp').innerHTML = weatherData.temp + '°C';
+        var desc = weatherData.description ? weatherData.description.charAt(0).toUpperCase() + weatherData.description.slice(1) : 'Снаружи';
+        if ($('weather-description')) $('weather-description').innerHTML = desc;
         $('top-outside-humidity').innerHTML = (weatherData.humidity || '--') + '%';
+        
+        // Фоновые эффекты
+        document.body.className = document.body.className.replace(/weather-[a-z]+/g, '').trim();
+        if (weatherData.main) {
+            var m = weatherData.main.toLowerCase();
+            var icon = weatherData.icon || '';
+            if (m.indexOf('storm')>=0 || m.indexOf('thunder')>=0 || icon.indexOf('11')>=0) document.body.className += ' weather-storm';
+            else if (m.indexOf('rain')>=0 || m.indexOf('drizzle')>=0 || icon.indexOf('09')>=0 || icon.indexOf('10')>=0) document.body.className += ' weather-rain';
+            else if (m.indexOf('snow')>=0 || icon.indexOf('13')>=0) document.body.className += ' weather-snow';
+            else if (m.indexOf('clear')>=0 || icon.indexOf('01')>=0) document.body.className += ' weather-clear';
+            else if (m.indexOf('cloud')>=0 || icon.indexOf('02')>=0 || icon.indexOf('03')>=0 || icon.indexOf('04')>=0) document.body.className += ' weather-clouds';
+        }
     } else {
         $('top-outside-temp').innerHTML = '--°C';
+        if ($('weather-description')) $('weather-description').innerHTML = 'Снаружи';
         $('top-outside-humidity').innerHTML = '--%';
     }
     
@@ -693,8 +688,19 @@ function renderDevices() {
         var isOn = false;
         var stateText = 'Выкл';
         var canToggle = false;
-        
+        var batteryText = '';
+        var specialClass = '';
+        var isContact = false;
+        var isTemp = false;
+
         if (status && status.main) {
+            // Батарея
+            if (status.main.battery && status.main.battery.battery) {
+                var batVal = Math.round(status.main.battery.battery.value);
+                var batColor = batVal < 20 ? '#f66' : '#888';
+                batteryText = ' <span style="font-size:10px;color:' + batColor + ';">[' + batVal + '%]</span>';
+            }
+            
             // Проверяем switch
             if (status.main.switch && status.main.switch.switch) {
                 if (status.main.switch.switch.value === 'on') {
@@ -705,11 +711,19 @@ function renderDevices() {
             }
             // Проверяем контактный датчик
             else if (status.main.contactSensor && status.main.contactSensor.contact) {
-                stateText = status.main.contactSensor.contact.value === 'open' ? 'Открыто' : 'Закрыто';
+                isContact = true;
+                isOn = status.main.contactSensor.contact.value === 'open';
+                stateText = isOn ? 'Открыто' : 'Закрыто';
+                specialClass = isOn ? ' contact-open' : ' contact-closed';
             }
             // Проверяем температуру
             else if (status.main.temperatureMeasurement && status.main.temperatureMeasurement.temperature) {
-                stateText = status.main.temperatureMeasurement.temperature.value + '°C';
+                isTemp = true;
+                stateText = 'Температура';
+                if (status.main.relativeHumidityMeasurement && status.main.relativeHumidityMeasurement.humidity) {
+                    stateText = Math.round(status.main.relativeHumidityMeasurement.humidity.value) + '% Влажность';
+                }
+                specialClass = ' temp-sensor';
             }
             // Проверяем движение
             else if (status.main.motionSensor && status.main.motionSensor.motion) {
@@ -724,13 +738,20 @@ function renderDevices() {
             rowOpen = true;
         }
         
-        var divClass = 'device' + (isOn ? ' on' : '');
+        var divClass = 'device' + (isOn && canToggle ? ' on' : '') + specialClass;
         var label = dev.label || 'Устройство';
         var icon = getDeviceIcon(dev, status);
         
-        html += '<div class="' + divClass + '" data-id="' + id + '" data-toggle="' + (canToggle ? '1' : '0') + '" data-on="' + (isOn ? '1' : '0') + '">';
+        // Передопределяем иконку для датчиков
+        if (isContact) {
+            icon = isOn ? '!' : '✓';
+        } else if (isTemp) {
+            icon = Math.round(status.main.temperatureMeasurement.temperature.value) + '°';
+        }
+        
+        html += '<div class="' + divClass + '" data-id="' + id + '" data-toggle="' + (canToggle ? '1' : '0') + '" data-on="' + (isOn && canToggle ? '1' : '0') + '">';
         html += '<span class="device-icon">' + icon + '</span>';
-        html += '<span class="device-name">' + label + '</span>';
+        html += '<span class="device-name">' + label + batteryText + '</span>';
         html += '<span class="device-status">' + stateText + '</span>';
         html += '</div>';
         
@@ -1032,7 +1053,35 @@ function turnOffAllMiniDevices() {
     }
 }
 
-
+var mainScreenState = 0;
+function rotateMainScreen() {
+    var bClock = $('box-clock');
+    var bOut = $('box-weather-out');
+    var bIn = $('box-weather-in');
+    
+    // Не меняем когда мы на другой странице или ошибка
+    if(currentPage !== 0 || !bClock || !bOut || !bIn) return;
+    
+    mainScreenState = (mainScreenState + 1) % 3;
+    
+    bClock.className = 'dash-box';
+    bOut.className = 'dash-box';
+    bIn.className = 'dash-box';
+    
+    if (mainScreenState === 0) {
+        bClock.className += ' slot-center';
+        bOut.className += ' slot-tl';
+        bIn.className += ' slot-tr';
+    } else if (mainScreenState === 1) {
+        bOut.className += ' slot-center';
+        bIn.className += ' slot-tl';
+        bClock.className += ' slot-tr';
+    } else {
+        bIn.className += ' slot-center';
+        bClock.className += ' slot-tl';
+        bOut.className += ' slot-tr';
+    }
+}
 
 document.addEventListener('mousedown', setActivity, false);
 document.addEventListener('mousemove', setActivity, false);
@@ -1044,6 +1093,7 @@ function init() {
     // Обновляем часы
     updateClock();
     setInterval(updateClock, 1000);
+    setInterval(rotateMainScreen, 10000);
     
     // Начальный статус
     setOnline(false);
