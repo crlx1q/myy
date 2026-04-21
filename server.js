@@ -914,8 +914,9 @@ function logEvent(type, data) {
 // ==========================================
 
 async function getWeather() {
+    if (!OPENWEATHER_KEY || !WEATHER_CITY) return false;
     try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_CITY}&appid=${OPENWEATHER_KEY}&units=metric&lang=ru`);
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(WEATHER_CITY)}&appid=${OPENWEATHER_KEY}&units=metric&lang=ru`);
         if (!response.ok) throw new Error(`Ошибка API погоды: ${response.statusText}`);
         
         const data = await response.json();
@@ -937,9 +938,10 @@ async function getWeather() {
 }
 
 async function getForecast() {
+    if (!OPENWEATHER_KEY || !WEATHER_CITY) return false;
     try {
         // Запрашиваем прогноз на 24 часа (8 интервалов по 3 часа = 24 часа)
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${WEATHER_CITY}&appid=${OPENWEATHER_KEY}&units=metric&lang=ru&cnt=8`);
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(WEATHER_CITY)}&appid=${OPENWEATHER_KEY}&units=metric&lang=ru&cnt=8`);
         if (!response.ok) throw new Error(`Ошибка API прогноза: ${response.statusText}`);
         
         const data = await response.json();
