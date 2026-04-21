@@ -1,18 +1,19 @@
 // token-manager.js
-// SmartThings OAuth токены хранятся in-memory + персистентно в Koyeb env (без файлов).
+// SmartThings OAuth — токены in-memory + Koyeb Secrets (без файлов, без redeploy).
 //
-// Ожидаемые env-переменные:
-//   SmartThings OAuth app:  ST_CLIENT_ID, ST_CLIENT_SECRET
-//   Текущие токены:         ST_ACCESS_TOKEN, ST_REFRESH_TOKEN (заполняются автоматически)
-//   Koyeb API:              KOYEB_API_TOKEN, KOYEB_APP_NAME
-//   Fallback (опц.):        SMARTTHINGS_PAT — если OAuth ещё не настроен
+// Стратегия персистентности:
+//   Токены (ST_ACCESS_TOKEN, ST_REFRESH_TOKEN) → Koyeb Secrets API (PUT /v1/secrets)
+//     Обновление секрета НЕ вызывает redeploy. При следующем рестарте сервис читает
+//     свежие значения из секретов (env ссылается на них).
+//   Client creds (ST_CLIENT_ID, ST_CLIENT_SECRET) → PATCH /v1/services (разовый redeploy
+//     при первой настройке через /api/auth/setup).
 //
-// Экспорт:
-//   getCurrentToken()                       — взять актуальный access_token
-//   startAutoRefresh()                      — запустить фоновое обновление (каждые 20ч)
-//   exchangeCodeAndSave(code, cid?, csec?)  — обменять code (из redirect) на токены
-//   createOAuthApp(pat, appName?, redirectUri) — создать OAuth-приложение через PAT
-//   saveClientCredsToKoyeb(cid, csec)       — записать client_id/secret в Koyeb env
+// Env-переменные:
+//   ST_CLIENT_ID, ST_CLIENT_SECRET   — OAuth app credentials
+//   ST_ACCESS_TOKEN, ST_REFRESH_TOKEN — текущие токены (из секретов Koyeb)
+//   KOYEB_API_TOKEN                  — Koyeb API token для управления секретами
+//   KOYEB_APP_NAME                   — имя app или service в Koyeb (для поиска сервиса)
+//   SMARTTHINGS_PAT                  — fallback если OAuth ещё не настроен
 
 require('dotenv').config();
 const https = require('https');
@@ -85,7 +86,161 @@ function koyebRequest(method, path, body, token) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// SmartThings: refresh access token
+// Koyeb Secrets: создать/обновить секрет (НЕ вызывает redeploy)
+// ────────────────────────────────────────────────────────────────
+async function upsertKoyebSecret(secretName, secretValue) {
+    const koyebToken = process.env.KOYEB_API_TOKEN;
+    if (!koyebToken) return;
+
+    // Ищем секрет по имени
+    const listRes = await koyebRequest('GET', `/v1/secrets?name=${encodeURIComponent(secretName)}&limit=100`, null, koyebToken);
+    const existing = listRes?.body?.secrets?.find(s => s.name === secretName);
+
+    if (existing) {
+        // Обновляем значение
+        const putRes = await koyebRequest('PUT', `/v1/secrets/${existing.id}`, {
+            name: secretName,
+            type: 'SIMPLE',
+            value: secretValue,
+        }, koyebToken);
+        if (putRes.status >= 400) {
+            throw new Error(`PUT secret "${secretName}" failed ${putRes.status}: ${JSON.stringify(putRes.body)}`);
+        }
+    } else {
+        // Создаём новый
+        const postRes = await koyebRequest('POST', '/v1/secrets', {
+            name: secretName,
+            type: 'SIMPLE',
+            value: secretValue,
+        }, koyebToken);
+        if (postRes.status >= 400) {
+            throw new Error(`POST secret "${secretName}" failed ${postRes.status}: ${JSON.stringify(postRes.body)}`);
+        }
+    }
+}
+
+// Обновить токены через Koyeb Secrets (без redeploy!)
+async function saveTokensToKoyebSecrets(accessToken, refreshToken) {
+    const koyebToken = process.env.KOYEB_API_TOKEN;
+    if (!koyebToken) {
+        console.warn('[TokenManager] ⚠️  KOYEB_API_TOKEN не задан — токены не переживут рестарт');
+        return;
+    }
+
+    try {
+        await upsertKoyebSecret('st-access-token', accessToken);
+        await upsertKoyebSecret('st-refresh-token', refreshToken);
+        console.log('[TokenManager] ✅ Koyeb secrets обновлены (без redeploy)');
+    } catch (e) {
+        console.error('[TokenManager] ❌ Koyeb secrets error:', e.message);
+    }
+}
+
+// ────────────────────────────────────────────────────────────────
+// Koyeb Service: обновить env definition (ВЫЗЫВАЕТ redeploy — только для разовых ops)
+// ────────────────────────────────────────────────────────────────
+async function findKoyebService(koyebToken, koyebApp) {
+    let service = null;
+
+    // Попытка 1: по имени app
+    const appsRes = await koyebRequest('GET', `/v1/apps?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
+    const app = appsRes?.body?.apps?.find(a => a.name === koyebApp) || appsRes?.body?.apps?.[0];
+    if (app?.id) {
+        const svcRes = await koyebRequest('GET', `/v1/services?app_id=${app.id}`, null, koyebToken);
+        service = svcRes?.body?.services?.[0];
+    }
+
+    // Попытка 2: по имени service
+    if (!service) {
+        const allSvc = await koyebRequest('GET', `/v1/services?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
+        service = allSvc?.body?.services?.find(s => s.name === koyebApp) || allSvc?.body?.services?.[0];
+    }
+
+    // Попытка 3: первый service
+    if (!service) {
+        const allSvc = await koyebRequest('GET', '/v1/services?limit=5', null, koyebToken);
+        service = allSvc?.body?.services?.[0];
+        if (service) console.log(`[TokenManager] ℹ️  Fallback на service: "${service.name}" (id: ${service.id})`);
+    }
+
+    return service;
+}
+
+async function updateKoyebServiceEnv(updates) {
+    const koyebToken = process.env.KOYEB_API_TOKEN;
+    const koyebApp   = process.env.KOYEB_APP_NAME;
+    if (!koyebToken || !koyebApp) {
+        console.warn('[TokenManager] ⚠️  KOYEB_API_TOKEN / KOYEB_APP_NAME не заданы');
+        return;
+    }
+
+    try {
+        const service = await findKoyebService(koyebToken, koyebApp);
+        if (!service?.id) throw new Error(`Service не найден. Проверь KOYEB_APP_NAME="${koyebApp}".`);
+
+        const deployId = service.latest_deployment_id || service.active_deployment_id;
+        if (!deployId) throw new Error('У сервиса нет latest_deployment_id');
+
+        const depRes = await koyebRequest('GET', `/v1/deployments/${deployId}`, null, koyebToken);
+        const definition = depRes?.body?.deployment?.definition;
+        if (!definition) throw new Error('Не получили definition');
+
+        // Мержим env
+        definition.env = mergeEnv(definition.env || [], updates);
+
+        const patchRes = await koyebRequest('PATCH', `/v1/services/${service.id}`, { definition }, koyebToken);
+        if (patchRes.status >= 400) {
+            throw new Error(`PATCH ${patchRes.status}: ${JSON.stringify(patchRes.body)}`);
+        }
+
+        console.log(`[TokenManager] ✅ Koyeb service env обновлён (${Object.keys(updates).join(', ')}) — будет redeploy`);
+    } catch (e) {
+        console.error('[TokenManager] ❌ Koyeb service update error:', e.message);
+    }
+}
+
+function mergeEnv(currentEnv, updates) {
+    const result = currentEnv.map(e => ({ ...e }));
+    for (const [key, value] of Object.entries(updates)) {
+        const idx = result.findIndex(e => e.key === key);
+        if (typeof value === 'object' && value.secret) {
+            // Ссылка на секрет: { key, secret: "secret-name" }
+            const entry = { key, secret: value.secret };
+            if (idx !== -1) { result[idx] = entry; } else { result.push(entry); }
+        } else {
+            // Обычное значение
+            const entry = { key, value: String(value) };
+            if (idx !== -1) {
+                result[idx] = { ...result[idx], ...entry };
+                delete result[idx].secret;
+            } else {
+                result.push(entry);
+            }
+        }
+    }
+    return result;
+}
+
+// ────────────────────────────────────────────────────────────────
+// Первоначальная настройка: привязать env vars к секретам (1 раз)
+// ────────────────────────────────────────────────────────────────
+async function setupTokenSecretsOnKoyeb(accessToken, refreshToken) {
+    const koyebToken = process.env.KOYEB_API_TOKEN;
+    if (!koyebToken) return;
+
+    // 1. Создать/обновить секреты
+    await upsertKoyebSecret('st-access-token', accessToken);
+    await upsertKoyebSecret('st-refresh-token', refreshToken);
+
+    // 2. Обновить service definition: env ссылается на секреты (redeploy — один раз)
+    await updateKoyebServiceEnv({
+        ST_ACCESS_TOKEN:  { secret: 'st-access-token' },
+        ST_REFRESH_TOKEN: { secret: 'st-refresh-token' },
+    });
+}
+
+// ────────────────────────────────────────────────────────────────
+// SmartThings: refresh access token (каждые 20ч)
 // ────────────────────────────────────────────────────────────────
 async function refreshAccessToken() {
     const clientId     = process.env.ST_CLIENT_ID;
@@ -93,7 +248,7 @@ async function refreshAccessToken() {
     const refreshToken = process.env.ST_REFRESH_TOKEN;
 
     if (!clientId || !clientSecret || !refreshToken) {
-        console.warn('[TokenManager] ⚠️  Нет ST_CLIENT_ID / ST_CLIENT_SECRET / ST_REFRESH_TOKEN — refresh пропущен. Пройди OAuth через /api/auth/authorize.');
+        console.warn('[TokenManager] ⚠️  OAuth не полностью настроен — refresh пропущен.');
         return;
     }
 
@@ -121,10 +276,8 @@ async function refreshAccessToken() {
 
         console.log('[TokenManager] ✅ Токен обновлён:', new Date().toISOString());
 
-        await updateKoyebEnv({
-            ST_ACCESS_TOKEN:  newAccess,
-            ST_REFRESH_TOKEN: newRefresh,
-        });
+        // Сохраняем в Koyeb Secrets — БЕЗ redeploy!
+        await saveTokensToKoyebSecrets(newAccess, newRefresh);
     } catch (e) {
         console.error('[TokenManager] ❌ Refresh error:', e.message);
     }
@@ -165,12 +318,8 @@ async function exchangeCodeAndSave(code, clientId, clientSecret, redirectUri) {
 
     console.log('[TokenManager] ✅ Code обменян на токены');
 
-    await updateKoyebEnv({
-        ST_ACCESS_TOKEN:  newAccess,
-        ST_REFRESH_TOKEN: newRefresh,
-        ST_CLIENT_ID:     clientId,
-        ST_CLIENT_SECRET: clientSecret,
-    });
+    // Первичная настройка: создать секреты + привязать env к ним (1 redeploy)
+    await setupTokenSecretsOnKoyeb(newAccess, newRefresh);
 
     return { access_token: newAccess, refresh_token: newRefresh };
 }
@@ -220,97 +369,13 @@ async function createOAuthApp(pat, { appName, redirectUri } = {}) {
     process.env.ST_CLIENT_ID     = clientId;
     process.env.ST_CLIENT_SECRET = clientSecret;
 
-    await updateKoyebEnv({
+    // Client creds — в service env (вызовет 1 redeploy, это нормально)
+    await updateKoyebServiceEnv({
         ST_CLIENT_ID:     clientId,
         ST_CLIENT_SECRET: clientSecret,
     });
 
     return { clientId, clientSecret, scopes: ST_SCOPES, redirectUri };
-}
-
-// ────────────────────────────────────────────────────────────────
-// Koyeb: обновить env vars сервиса (триггерит redeploy)
-// ────────────────────────────────────────────────────────────────
-async function updateKoyebEnv(updates) {
-    const koyebToken = process.env.KOYEB_API_TOKEN;
-    const koyebApp   = process.env.KOYEB_APP_NAME;
-
-    if (!koyebToken || !koyebApp) {
-        console.warn('[TokenManager] ⚠️  KOYEB_API_TOKEN / KOYEB_APP_NAME не заданы — изменения не переживут рестарт');
-        return;
-    }
-
-    try {
-        // Находим service: сначала по app name, потом по service name
-        let service = null;
-
-        // Попытка 1: KOYEB_APP_NAME — это имя App
-        const appsRes = await koyebRequest('GET', `/v1/apps?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
-        const app = appsRes?.body?.apps?.find(a => a.name === koyebApp) || appsRes?.body?.apps?.[0];
-        if (app?.id) {
-            const svcRes = await koyebRequest('GET', `/v1/services?app_id=${app.id}`, null, koyebToken);
-            service = svcRes?.body?.services?.[0];
-        }
-
-        // Попытка 2: KOYEB_APP_NAME — это имя Service (частый случай)
-        if (!service) {
-            const allSvc = await koyebRequest('GET', `/v1/services?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
-            service = allSvc?.body?.services?.find(s => s.name === koyebApp) || allSvc?.body?.services?.[0];
-        }
-
-        // Попытка 3: вообще взять первый service в аккаунте
-        if (!service) {
-            const allSvc = await koyebRequest('GET', '/v1/services?limit=5', null, koyebToken);
-            service = allSvc?.body?.services?.[0];
-            if (service) {
-                console.log(`[TokenManager] ℹ️  App/Service "${koyebApp}" не найден по имени, но нашёлся service: "${service.name}" (id: ${service.id})`);
-            }
-        }
-
-        if (!service?.id) {
-            // Показываем все apps для отладки
-            const debugApps = await koyebRequest('GET', '/v1/apps?limit=10', null, koyebToken);
-            console.error('[TokenManager] Доступные apps:', JSON.stringify(debugApps?.body?.apps?.map(a => a.name)));
-            throw new Error(`Koyeb: не найден ни app, ни service с именем "${koyebApp}". Проверь KOYEB_APP_NAME.`);
-        }
-
-        // 3. latest deployment (там — полный definition)
-        const deployId = service.latest_deployment_id || service.active_deployment_id;
-        if (!deployId) throw new Error('У сервиса нет latest_deployment_id');
-        const depRes = await koyebRequest('GET', `/v1/deployments/${deployId}`, null, koyebToken);
-        const definition = depRes?.body?.deployment?.definition;
-        if (!definition) throw new Error('Не получили definition из deployment: ' + JSON.stringify(depRes.body));
-
-        // 4. merge env
-        definition.env = mergeEnv(definition.env || [], updates);
-
-        // 5. PATCH service — Koyeb сам создаст новый deployment
-        const patchRes = await koyebRequest('PATCH', `/v1/services/${service.id}`, { definition }, koyebToken);
-        if (patchRes.status >= 400) {
-            throw new Error(`PATCH failed ${patchRes.status}: ${JSON.stringify(patchRes.body)}`);
-        }
-
-        console.log(`[TokenManager] ✅ Koyeb env обновлён (${Object.keys(updates).join(', ')}) — будет redeploy`);
-    } catch (e) {
-        console.error('[TokenManager] ❌ Koyeb update error:', e.message);
-    }
-}
-
-function mergeEnv(currentEnv, updates) {
-    const result = currentEnv.map(e => ({ ...e }));
-    for (const [key, value] of Object.entries(updates)) {
-        const idx = result.findIndex(e => e.key === key);
-        const entry = { key, value };
-        if (idx !== -1) {
-            // сохраняем scopes если были
-            result[idx] = { ...result[idx], ...entry };
-            // если раньше было secret — value нельзя слать вместе с secret reference, сбрасываем secret
-            delete result[idx].secret;
-        } else {
-            result.push(entry);
-        }
-    }
-    return result;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -322,7 +387,7 @@ function getCurrentToken() {
 
 function startAutoRefresh() {
     if (!process.env.ST_CLIENT_ID || !process.env.ST_REFRESH_TOKEN) {
-        console.warn('[TokenManager] ⚠️  OAuth не настроен — авто-refresh отключён. Открой /api/auth/authorize.');
+        console.warn('[TokenManager] ⚠️  OAuth не настроен — авто-refresh отключён. Открой /api/auth/setup.');
         return;
     }
     console.log('[TokenManager] 🏠 Авто-refresh каждые 20ч');
@@ -330,17 +395,10 @@ function startAutoRefresh() {
     setInterval(refreshAccessToken, REFRESH_INTERVAL_MS);
 }
 
-async function saveClientCredsToKoyeb(clientId, clientSecret) {
-    process.env.ST_CLIENT_ID     = clientId;
-    process.env.ST_CLIENT_SECRET = clientSecret;
-    await updateKoyebEnv({ ST_CLIENT_ID: clientId, ST_CLIENT_SECRET: clientSecret });
-}
-
 module.exports = {
     getCurrentToken,
     startAutoRefresh,
     exchangeCodeAndSave,
     createOAuthApp,
-    saveClientCredsToKoyeb,
     ST_SCOPES,
 };
