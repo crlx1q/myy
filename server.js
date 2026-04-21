@@ -2,7 +2,13 @@
 require('dotenv').config();
 
 // Авто-обновление токена SmartThings
-const { getCurrentToken, startAutoRefresh } = require('./token-manager');
+const {
+    getCurrentToken,
+    startAutoRefresh,
+    exchangeCodeAndSave,
+    createOAuthApp,
+    ST_SCOPES,
+} = require('./token-manager');
 
 const express = require('express');
 const http = require('http');
@@ -45,7 +51,8 @@ function getHourInTimezone(date = new Date(), timeZone = TIMEZONE) {
 // НАСТРОЙКИ API (хранятся в переменных окружения)
 // ==========================================
 const SMARTTHINGS_API_URL = 'https://api.smartthings.com/v1';
-const SMARTTHINGS_PAT = process.env.SMARTTHINGS_PAT; // Personal Access Token
+// Токен берём через getCurrentToken() — это OAuth access_token из памяти/Koyeb env,
+// либо fallback на SMARTTHINGS_PAT если OAuth ещё не настроен.
 
 const OPENWEATHER_KEY = process.env.OPENWEATHER_KEY;
 const WEATHER_CITY = process.env.WEATHER_CITY;
@@ -143,7 +150,7 @@ function markSmartThingsAuthFailure() {
 async function smartThingsRequest(endpoint, options = {}, { allowAuthCooldown = true } = {}) {
     const activeToken = getCurrentToken();
     if (!activeToken) {
-        throw new Error('Нет токена SmartThings. Задай SMARTTHINGS_PAT в .env или настрой OAuth.');
+        throw new Error('Нет токена SmartThings. Настрой OAuth через /api/auth/authorize.');
     }
 
     if (allowAuthCooldown && !canCallSmartThings()) {
@@ -509,8 +516,7 @@ async function fetchDevicesList(includeCapabilities = false) {
 
         if (!response.ok) {
             if (response.status === 401 || response.status === 403) {
-                console.error('Ошибка авторизации SmartThings API. Проверьте токен (SMARTTHINGS_PAT) в файле server.js');
-                console.error('Токен может быть недействителен или истек. Получите новый токен на https://account.smartthings.com/tokens');
+                console.error('Ошибка авторизации SmartThings API (401/403). Пройди OAuth заново: /api/auth/authorize');
                 currentDevices = [];
                 updateDeviceRefreshQueue();
                 return false;
@@ -1170,6 +1176,134 @@ io.on('connection', (socket) => {
 // ==========================================
 // HTTP РОУТЫ
 // ==========================================
+
+// ==========================================
+// OAuth SmartThings — полная автоматизация через HTTP
+// ==========================================
+// Полный flow (1 раз, прямо в браузере):
+//   1. GET /api/auth/setup?pat=<PAT>&baseUrl=<https://my.koyeb.app>
+//        → создаёт OAuth-приложение в SmartThings, пишет ST_CLIENT_ID/SECRET в Koyeb env,
+//          возвращает ссылку на /api/auth/authorize
+//   2. GET /api/auth/authorize
+//        → редирект на SmartThings consent screen
+//   3. SmartThings редиректит на /api/auth/callback?code=...
+//        → обменивает code на access/refresh токены, пишет их в Koyeb env,
+//          сбрасывает блокировку и запускает refresh устройств
+//
+// Все ручки защищены ADMIN_PASSWORD — передавай как ?admin=<пароль>.
+
+function getBaseUrl(req) {
+    return process.env.PUBLIC_BASE_URL
+        || `${req.protocol}://${req.get('host')}`;
+}
+function checkAdmin(req, res) {
+    if (req.query.admin !== ADMIN_PASSWORD) {
+        res.status(401).type('text/plain').send('Требуется ?admin=<пароль>');
+        return false;
+    }
+    return true;
+}
+function authHtml(title, body) {
+    return `<!doctype html><meta charset="utf-8"><title>${title}</title>
+<style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.5}
+code{background:#f4f4f4;padding:2px 6px;border-radius:4px;font-size:13px;word-break:break-all}
+.box{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin:12px 0}
+a.btn{display:inline-block;background:#1976d2;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;margin-top:8px}
+h1{margin-top:0}</style>${body}`;
+}
+
+// Шаг 1: создать OAuth-приложение в SmartThings через PAT
+app.get('/api/auth/setup', async (req, res) => {
+    if (!checkAdmin(req, res)) return;
+    const pat     = req.query.pat;
+    const baseUrl = (req.query.baseUrl || getBaseUrl(req)).replace(/\/$/, '');
+
+    if (!pat) {
+        return res.type('text/html').send(authHtml('Setup', `
+<h1>⚙️ Шаг 1: создать OAuth-приложение</h1>
+<p>Нужен <b>Personal Access Token</b> от SmartThings (разовый, используется только сейчас).</p>
+<ol>
+  <li>Создай PAT: <a href="https://account.smartthings.com/tokens" target="_blank">account.smartthings.com/tokens</a><br>
+      Scope: <code>Apps (All)</code> + <code>Devices (All)</code></li>
+  <li>Вставь его ниже и нажми кнопку.</li>
+</ol>
+<form method="get" action="/api/auth/setup">
+  <input type="hidden" name="admin" value="${ADMIN_PASSWORD}">
+  <p><input name="pat" style="width:100%;padding:8px;font-family:monospace" placeholder="PAT token" required></p>
+  <p><input name="baseUrl" style="width:100%;padding:8px" value="${baseUrl}"></p>
+  <button class="btn" style="border:0;cursor:pointer">Создать OAuth app</button>
+</form>`));
+    }
+
+    try {
+        const redirectUri = `${baseUrl}/api/auth/callback`;
+        const creds = await createOAuthApp(pat, { redirectUri });
+        const authorizeUrl = `${baseUrl}/api/auth/authorize?admin=${encodeURIComponent(ADMIN_PASSWORD)}`;
+        res.type('text/html').send(authHtml('Setup OK', `
+<h1>✅ OAuth-приложение создано</h1>
+<div class="box">
+  <p><b>Client ID:</b> <code>${creds.clientId}</code></p>
+  <p><b>Client Secret:</b> <code>${creds.clientSecret.slice(0,8)}…</code> (записан в Koyeb env)</p>
+  <p><b>Redirect URI:</b> <code>${redirectUri}</code></p>
+</div>
+<p>Client ID/Secret отправлены в Koyeb env — сервис <b>сейчас будет перезапущен</b> (это нормально).</p>
+<p>После рестарта открой <b>шаг 2</b>:</p>
+<a class="btn" href="${authorizeUrl}">→ Шаг 2: авторизация</a>`));
+    } catch (e) {
+        console.error('[auth/setup] ', e);
+        res.status(500).type('text/html').send(authHtml('Setup error', `<h1>❌ ${e.message}</h1>`));
+    }
+});
+
+// Шаг 2: редирект на SmartThings consent screen
+app.get('/api/auth/authorize', (req, res) => {
+    if (!checkAdmin(req, res)) return;
+    const clientId = process.env.ST_CLIENT_ID;
+    if (!clientId) return res.status(400).type('text/plain').send('Сначала пройди /api/auth/setup');
+    const redirectUri = `${getBaseUrl(req)}/api/auth/callback`;
+    const url = 'https://api.smartthings.com/oauth/authorize'
+        + '?response_type=code'
+        + `&client_id=${encodeURIComponent(clientId)}`
+        + `&redirect_uri=${encodeURIComponent(redirectUri)}`
+        + `&scope=${encodeURIComponent(ST_SCOPES.join(' '))}`;
+    res.redirect(url);
+});
+
+// Шаг 3: callback от SmartThings — меняем code на токены
+app.get('/api/auth/callback', async (req, res) => {
+    const code = req.query.code;
+    if (!code) return res.status(400).type('text/plain').send('Нет ?code в запросе');
+    try {
+        const redirectUri = `${getBaseUrl(req)}/api/auth/callback`;
+        await exchangeCodeAndSave(code, null, null, redirectUri);
+        smartThingsAuthBlockedUntil = 0;
+        refreshAllData({ mode: 'heavy', forceCapabilities: true }).catch(err =>
+            console.error('[auth/callback] refresh error:', err.message));
+        res.type('text/html').send(authHtml('Auth OK', `
+<h1>✅ Готово</h1>
+<p>Токены записаны в память и в Koyeb env. Дашборд оживает.</p>
+<p><a class="btn" href="/">Открыть дашборд</a></p>`));
+    } catch (e) {
+        console.error('[auth/callback] ', e);
+        res.status(500).type('text/html').send(authHtml('Auth error', `<h1>❌ ${e.message}</h1>
+<p><a href="/api/auth/authorize?admin=${encodeURIComponent(ADMIN_PASSWORD)}">Попробовать ещё раз</a></p>`));
+    }
+});
+
+// Legacy: ручной обмен code (для случаев когда SmartThings не смог редиректнуть)
+app.get('/api/auth/code', async (req, res) => {
+    const { code, clientId, clientSecret, redirectUri } = req.query;
+    if (!code) return res.status(400).type('text/plain').send('Нужен ?code');
+    try {
+        await exchangeCodeAndSave(code, clientId, clientSecret, redirectUri);
+        smartThingsAuthBlockedUntil = 0;
+        refreshAllData({ mode: 'heavy', forceCapabilities: true }).catch(err =>
+            console.error('[auth/code] refresh error:', err.message));
+        res.type('text/html').send('<!doctype html><meta charset="utf-8"><h1>✅ Токены в памяти, Koyeb обновлен</h1>');
+    } catch (e) {
+        res.status(500).type('text/plain').send('❌ ' + e.message);
+    }
+});
 
 // Раздача статических файлов
 app.use(express.static(path.join(__dirname)));

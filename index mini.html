@@ -21,6 +21,7 @@
             position: fixed;
             font-size: 14px;
             transition: background 2s ease;
+            overscroll-behavior-x: none;
         }
         
         /* Статус бар */
@@ -324,10 +325,7 @@
 
         /* Погодные фоны */
         body.weather-rain { background-color: #001533 !important; }
-        body.weather-snow { background-color: #222233 !important; }
-        body.weather-clear { background-color: #251800 !important; }
-        body.weather-clouds { background-color: #1a1f26 !important; }
-        body.weather-storm { background-color: #250a33 !important; }
+        body.weather-snow { background-color: #555566 !important; }
 
         /* Специфичные датчики */
         .device.contact-open { border-color: #f00; background: #2a0000; }
@@ -567,11 +565,11 @@ function updateWeather() {
         if (weatherData.main) {
             var m = weatherData.main.toLowerCase();
             var icon = weatherData.icon || '';
-            if (m.indexOf('storm')>=0 || m.indexOf('thunder')>=0 || icon.indexOf('11')>=0) document.body.className += ' weather-storm';
-            else if (m.indexOf('rain')>=0 || m.indexOf('drizzle')>=0 || icon.indexOf('09')>=0 || icon.indexOf('10')>=0) document.body.className += ' weather-rain';
-            else if (m.indexOf('snow')>=0 || icon.indexOf('13')>=0) document.body.className += ' weather-snow';
-            else if (m.indexOf('clear')>=0 || icon.indexOf('01')>=0) document.body.className += ' weather-clear';
-            else if (m.indexOf('cloud')>=0 || icon.indexOf('02')>=0 || icon.indexOf('03')>=0 || icon.indexOf('04')>=0) document.body.className += ' weather-clouds';
+            if (m.indexOf('rain')>=0 || m.indexOf('drizzle')>=0 || icon.indexOf('09')>=0 || icon.indexOf('10')>=0) {
+                document.body.className += ' weather-rain';
+            } else if (m.indexOf('snow')>=0 || icon.indexOf('13')>=0) {
+                document.body.className += ' weather-snow';
+            }
         }
     } else {
         $('top-outside-temp').innerHTML = '--°C';

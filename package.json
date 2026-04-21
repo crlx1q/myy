@@ -1,10 +1,14 @@
 {
   "name": "smart-home-dashboard",
-  "version": "1.0.0",
-  "description": "Smart Home Dashboard Server",
+  "version": "2.0.0",
+  "description": "Smart Home Dashboard — Koyeb-ready (no FS tokens)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
@@ -14,10 +18,7 @@
     "node-fetch": "^2.7.0",
     "socket.io": "^4.6.1"
   },
-  "keywords": [
-    "smart-home",
-    "dashboard"
-  ],
+  "keywords": ["smart-home", "dashboard", "smartthings", "koyeb"],
   "author": "",
   "license": "ISC"
 }

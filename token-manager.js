@@ -1,150 +1,53 @@
-// token-manager.js — работает с Koyeb (env vars, без файлов)
+// token-manager.js
+// SmartThings OAuth токены хранятся in-memory + персистентно в Koyeb env (без файлов).
+//
+// Ожидаемые env-переменные:
+//   SmartThings OAuth app:  ST_CLIENT_ID, ST_CLIENT_SECRET
+//   Текущие токены:         ST_ACCESS_TOKEN, ST_REFRESH_TOKEN (заполняются автоматически)
+//   Koyeb API:              KOYEB_API_TOKEN, KOYEB_APP_NAME
+//   Fallback (опц.):        SMARTTHINGS_PAT — если OAuth ещё не настроен
+//
+// Экспорт:
+//   getCurrentToken()                       — взять актуальный access_token
+//   startAutoRefresh()                      — запустить фоновое обновление (каждые 20ч)
+//   exchangeCodeAndSave(code, cid?, csec?)  — обменять code (из redirect) на токены
+//   createOAuthApp(pat, appName?, redirectUri) — создать OAuth-приложение через PAT
+//   saveClientCredsToKoyeb(cid, csec)       — записать client_id/secret в Koyeb env
+
 require('dotenv').config();
 const https = require('https');
 
 const REFRESH_INTERVAL_MS = 20 * 60 * 60 * 1000; // 20 часов
+const ST_SCOPES = [
+    'r:devices:*', 'w:devices:*', 'x:devices:*',
+    'r:locations:*', 'r:scenes:*', 'x:scenes:*',
+    'r:rules:*', 'w:rules:*',
+];
+
 let _currentToken = process.env.ST_ACCESS_TOKEN || null;
 
-// ── Обновить токен через refresh_token ────────────────────────
-async function refreshAccessToken() {
-    const clientId     = process.env.ST_CLIENT_ID;
-    const clientSecret = process.env.ST_CLIENT_SECRET;
-    const refreshToken = process.env.ST_REFRESH_TOKEN;
-
-    if (!clientId || !clientSecret || !refreshToken) {
-        console.error('[TokenManager] ❌ Нет ST_CLIENT_ID / ST_CLIENT_SECRET / ST_REFRESH_TOKEN в env');
-        return;
-    }
-
-    console.log('[TokenManager] 🔄 Обновляю токен...');
-
-    try {
-        const bodyStr = new URLSearchParams({
-            grant_type:    'refresh_token',
-            refresh_token: refreshToken,
-            client_id:     clientId,
-            client_secret: clientSecret,
-        }).toString();
-
-        const data = await new Promise((resolve, reject) => {
-            const req = https.request({
-                hostname: 'api.smartthings.com',
-                path:     '/oauth/token',
-                method:   'POST',
-                headers:  {
-                    'Content-Type':   'application/x-www-form-urlencoded',
-                    'Content-Length': Buffer.byteLength(bodyStr),
-                    'Authorization':  'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64'),
-                },
-            }, res => {
-                let d = '';
-                res.on('data', c => d += c);
-                res.on('end',  () => resolve({ status: res.statusCode, body: JSON.parse(d) }));
-            });
-            req.on('error', reject);
-            req.write(bodyStr);
-            req.end();
-        });
-
-        if (data.status !== 200 || !data.body.access_token) {
-            console.error('[TokenManager] ❌ Ошибка обновления:', JSON.stringify(data.body));
-            return;
-        }
-
-        const newAccess  = data.body.access_token;
-        const newRefresh = data.body.refresh_token || refreshToken;
-
-        // Обновляем в памяти
-        _currentToken = newAccess;
-        process.env.ST_ACCESS_TOKEN  = newAccess;
-        process.env.ST_REFRESH_TOKEN = newRefresh;
-
-        console.log('[TokenManager] ✅ Токен обновлён:', new Date().toISOString());
-
-        // Сохраняем в Koyeb чтобы пережить рестарт
-        await updateKoyebEnv(newAccess, newRefresh);
-
-    } catch (e) {
-        console.error('[TokenManager] ❌ Исключение:', e.message);
-    }
-}
-
-// ── Обновить env vars в Koyeb через API ───────────────────────
-async function updateKoyebEnv(accessToken, refreshToken) {
-    const koyebToken  = process.env.KOYEB_API_TOKEN;
-    const koyebApp    = process.env.KOYEB_APP_NAME;
-
-    if (!koyebToken || !koyebApp) {
-        console.warn('[TokenManager] ⚠️  KOYEB_API_TOKEN / KOYEB_APP_NAME не заданы — токен не сохранится после рестарта');
-        return;
-    }
-
-    try {
-        // 1. Получить список сервисов приложения
-        const services = await koyebRequest('GET', `/v1/services?app_name=${koyebApp}`, null, koyebToken);
-        const service  = services?.services?.[0];
-        if (!service) {
-            console.error('[TokenManager] ❌ Сервис Koyeb не найден для app:', koyebApp);
-            return;
-        }
-
-        // 2. Получить текущий definition сервиса
-        const svcDetail = await koyebRequest('GET', `/v1/services/${service.id}`, null, koyebToken);
-        const definition = svcDetail?.service?.latest_deployment_id
-            ? svcDetail.service
-            : service;
-
-        // 3. Обновить только нужные env vars
-        const currentEnv = definition?.latest_provisioning_config?.env || [];
-
-        const updatedEnv = mergeEnv(currentEnv, {
-            ST_ACCESS_TOKEN:  accessToken,
-            ST_REFRESH_TOKEN: refreshToken,
-        });
-
-        await koyebRequest('PATCH', `/v1/services/${service.id}`, {
-            definition: {
-                env: updatedEnv,
-            },
-        }, koyebToken);
-
-        console.log('[TokenManager] ✅ Koyeb env обновлён');
-    } catch (e) {
-        console.error('[TokenManager] ❌ Ошибка обновления Koyeb env:', e.message);
-    }
-}
-
-function mergeEnv(currentEnv, updates) {
-    const result = [...currentEnv];
-    for (const [key, value] of Object.entries(updates)) {
-        const idx = result.findIndex(e => e.key === key);
-        if (idx !== -1) {
-            result[idx] = { key, value };
-        } else {
-            result.push({ key, value });
-        }
-    }
-    return result;
-}
-
-function koyebRequest(method, path, body, token) {
+// ────────────────────────────────────────────────────────────────
+// HTTPS helpers
+// ────────────────────────────────────────────────────────────────
+function httpsRequest({ hostname, path, method, headers = {}, body = null }) {
     return new Promise((resolve, reject) => {
-        const bodyStr = body ? JSON.stringify(body) : null;
+        const bodyStr = body == null ? null
+            : (typeof body === 'string' ? body : JSON.stringify(body));
         const req = https.request({
-            hostname: 'app.koyeb.com',
+            hostname,
             path,
             method,
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type':  'application/json',
+                ...headers,
                 ...(bodyStr ? { 'Content-Length': Buffer.byteLength(bodyStr) } : {}),
             },
         }, res => {
-            let d = '';
-            res.on('data', c => d += c);
+            let data = '';
+            res.on('data', c => data += c);
             res.on('end',  () => {
-                try { resolve(JSON.parse(d)); }
-                catch { resolve(d); }
+                let parsed = data;
+                try { parsed = JSON.parse(data); } catch {}
+                resolve({ status: res.statusCode, body: parsed });
             });
         });
         req.on('error', reject);
@@ -153,25 +56,268 @@ function koyebRequest(method, path, body, token) {
     });
 }
 
-// ── Получить текущий токен ────────────────────────────────────
+function stFormPost(path, params, basicAuth) {
+    const body = new URLSearchParams(params).toString();
+    return httpsRequest({
+        hostname: 'api.smartthings.com',
+        path,
+        method: 'POST',
+        headers: {
+            'Content-Type':  'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + Buffer.from(basicAuth).toString('base64'),
+        },
+        body,
+    });
+}
+
+function koyebRequest(method, path, body, token) {
+    return httpsRequest({
+        hostname: 'app.koyeb.com',
+        path,
+        method,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept':        'application/json',
+            ...(body ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body,
+    });
+}
+
+// ────────────────────────────────────────────────────────────────
+// SmartThings: refresh access token
+// ────────────────────────────────────────────────────────────────
+async function refreshAccessToken() {
+    const clientId     = process.env.ST_CLIENT_ID;
+    const clientSecret = process.env.ST_CLIENT_SECRET;
+    const refreshToken = process.env.ST_REFRESH_TOKEN;
+
+    if (!clientId || !clientSecret || !refreshToken) {
+        console.warn('[TokenManager] ⚠️  Нет ST_CLIENT_ID / ST_CLIENT_SECRET / ST_REFRESH_TOKEN — refresh пропущен. Пройди OAuth через /api/auth/authorize.');
+        return;
+    }
+
+    console.log('[TokenManager] 🔄 Refresh access token...');
+
+    try {
+        const res = await stFormPost('/oauth/token', {
+            grant_type:    'refresh_token',
+            refresh_token: refreshToken,
+            client_id:     clientId,
+            client_secret: clientSecret,
+        }, `${clientId}:${clientSecret}`);
+
+        if (res.status !== 200 || !res.body.access_token) {
+            console.error('[TokenManager] ❌ Refresh отклонён:', JSON.stringify(res.body));
+            return;
+        }
+
+        const newAccess  = res.body.access_token;
+        const newRefresh = res.body.refresh_token || refreshToken;
+
+        _currentToken = newAccess;
+        process.env.ST_ACCESS_TOKEN  = newAccess;
+        process.env.ST_REFRESH_TOKEN = newRefresh;
+
+        console.log('[TokenManager] ✅ Токен обновлён:', new Date().toISOString());
+
+        await updateKoyebEnv({
+            ST_ACCESS_TOKEN:  newAccess,
+            ST_REFRESH_TOKEN: newRefresh,
+        });
+    } catch (e) {
+        console.error('[TokenManager] ❌ Refresh error:', e.message);
+    }
+}
+
+// ────────────────────────────────────────────────────────────────
+// SmartThings: обмен code → tokens (первичная авторизация)
+// ────────────────────────────────────────────────────────────────
+async function exchangeCodeAndSave(code, clientId, clientSecret, redirectUri) {
+    clientId     = clientId     || process.env.ST_CLIENT_ID;
+    clientSecret = clientSecret || process.env.ST_CLIENT_SECRET;
+
+    if (!code)         throw new Error('code обязателен');
+    if (!clientId)     throw new Error('clientId не задан (env ST_CLIENT_ID пуст)');
+    if (!clientSecret) throw new Error('clientSecret не задан (env ST_CLIENT_SECRET пуст)');
+
+    const params = {
+        grant_type:    'authorization_code',
+        code,
+        client_id:     clientId,
+        client_secret: clientSecret,
+    };
+    if (redirectUri) params.redirect_uri = redirectUri;
+
+    const res = await stFormPost('/oauth/token', params, `${clientId}:${clientSecret}`);
+    if (res.status !== 200 || !res.body.access_token) {
+        throw new Error('SmartThings отклонил code: ' + JSON.stringify(res.body));
+    }
+
+    const newAccess  = res.body.access_token;
+    const newRefresh = res.body.refresh_token;
+
+    _currentToken = newAccess;
+    process.env.ST_ACCESS_TOKEN  = newAccess;
+    process.env.ST_REFRESH_TOKEN = newRefresh;
+    process.env.ST_CLIENT_ID     = clientId;
+    process.env.ST_CLIENT_SECRET = clientSecret;
+
+    console.log('[TokenManager] ✅ Code обменян на токены');
+
+    await updateKoyebEnv({
+        ST_ACCESS_TOKEN:  newAccess,
+        ST_REFRESH_TOKEN: newRefresh,
+        ST_CLIENT_ID:     clientId,
+        ST_CLIENT_SECRET: clientSecret,
+    });
+
+    return { access_token: newAccess, refresh_token: newRefresh };
+}
+
+// ────────────────────────────────────────────────────────────────
+// SmartThings: создать OAuth-приложение (через PAT, разовая операция)
+// ────────────────────────────────────────────────────────────────
+async function createOAuthApp(pat, { appName, redirectUri } = {}) {
+    if (!pat)         throw new Error('PAT обязателен');
+    if (!redirectUri) throw new Error('redirectUri обязателен');
+
+    const body = {
+        appName:         (appName || `smart-home-${Date.now()}`).toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        displayName:     'Smart Home',
+        description:     'Умный дом',
+        appType:         'API_ONLY',
+        classifications: ['AUTOMATION'],
+        apiOnly:         {},
+        oauth: {
+            clientName:   'smart-home',
+            scope:        ST_SCOPES,
+            redirectUris: [redirectUri],
+        },
+    };
+
+    const res = await httpsRequest({
+        hostname: 'api.smartthings.com',
+        path:     '/v1/apps',
+        method:   'POST',
+        headers:  {
+            'Authorization': `Bearer ${pat}`,
+            'Content-Type':  'application/json',
+        },
+        body,
+    });
+
+    if (res.status !== 200 && res.status !== 201) {
+        throw new Error(`SmartThings API ${res.status}: ${JSON.stringify(res.body)}`);
+    }
+
+    const clientId     = res.body?.oauthClientId     || res.body?.app?.oauthClientId;
+    const clientSecret = res.body?.oauthClientSecret || res.body?.app?.oauthClientSecret;
+    if (!clientId || !clientSecret) {
+        throw new Error('Не получили clientId/clientSecret: ' + JSON.stringify(res.body));
+    }
+
+    process.env.ST_CLIENT_ID     = clientId;
+    process.env.ST_CLIENT_SECRET = clientSecret;
+
+    await updateKoyebEnv({
+        ST_CLIENT_ID:     clientId,
+        ST_CLIENT_SECRET: clientSecret,
+    });
+
+    return { clientId, clientSecret, scopes: ST_SCOPES, redirectUri };
+}
+
+// ────────────────────────────────────────────────────────────────
+// Koyeb: обновить env vars сервиса (триггерит redeploy)
+// ────────────────────────────────────────────────────────────────
+async function updateKoyebEnv(updates) {
+    const koyebToken = process.env.KOYEB_API_TOKEN;
+    const koyebApp   = process.env.KOYEB_APP_NAME;
+
+    if (!koyebToken || !koyebApp) {
+        console.warn('[TokenManager] ⚠️  KOYEB_API_TOKEN / KOYEB_APP_NAME не заданы — изменения не переживут рестарт');
+        return;
+    }
+
+    try {
+        // 1. app_id по имени
+        const appsRes = await koyebRequest('GET', `/v1/apps?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
+        const app = appsRes?.body?.apps?.find(a => a.name === koyebApp) || appsRes?.body?.apps?.[0];
+        if (!app?.id) throw new Error(`Koyeb app "${koyebApp}" не найден`);
+
+        // 2. services этого app
+        const svcRes = await koyebRequest('GET', `/v1/services?app_id=${app.id}`, null, koyebToken);
+        const service = svcRes?.body?.services?.[0];
+        if (!service?.id) throw new Error(`Koyeb services для app "${koyebApp}" не найдены`);
+
+        // 3. latest deployment (там — полный definition)
+        const deployId = service.latest_deployment_id || service.active_deployment_id;
+        if (!deployId) throw new Error('У сервиса нет latest_deployment_id');
+        const depRes = await koyebRequest('GET', `/v1/deployments/${deployId}`, null, koyebToken);
+        const definition = depRes?.body?.deployment?.definition;
+        if (!definition) throw new Error('Не получили definition из deployment: ' + JSON.stringify(depRes.body));
+
+        // 4. merge env
+        definition.env = mergeEnv(definition.env || [], updates);
+
+        // 5. PATCH service — Koyeb сам создаст новый deployment
+        const patchRes = await koyebRequest('PATCH', `/v1/services/${service.id}`, { definition }, koyebToken);
+        if (patchRes.status >= 400) {
+            throw new Error(`PATCH failed ${patchRes.status}: ${JSON.stringify(patchRes.body)}`);
+        }
+
+        console.log(`[TokenManager] ✅ Koyeb env обновлён (${Object.keys(updates).join(', ')}) — будет redeploy`);
+    } catch (e) {
+        console.error('[TokenManager] ❌ Koyeb update error:', e.message);
+    }
+}
+
+function mergeEnv(currentEnv, updates) {
+    const result = currentEnv.map(e => ({ ...e }));
+    for (const [key, value] of Object.entries(updates)) {
+        const idx = result.findIndex(e => e.key === key);
+        const entry = { key, value };
+        if (idx !== -1) {
+            // сохраняем scopes если были
+            result[idx] = { ...result[idx], ...entry };
+            // если раньше было secret — value нельзя слать вместе с secret reference, сбрасываем secret
+            delete result[idx].secret;
+        } else {
+            result.push(entry);
+        }
+    }
+    return result;
+}
+
+// ────────────────────────────────────────────────────────────────
+// Публичный API
+// ────────────────────────────────────────────────────────────────
 function getCurrentToken() {
     return _currentToken || process.env.ST_ACCESS_TOKEN || process.env.SMARTTHINGS_PAT || null;
 }
 
-// ── Запустить авто-обновление ─────────────────────────────────
 function startAutoRefresh() {
-    if (!process.env.ST_CLIENT_ID) {
-        console.warn('[TokenManager] ⚠️  ST_CLIENT_ID не задан, авто-обновление отключено');
+    if (!process.env.ST_CLIENT_ID || !process.env.ST_REFRESH_TOKEN) {
+        console.warn('[TokenManager] ⚠️  OAuth не настроен — авто-refresh отключён. Открой /api/auth/authorize.');
         return;
     }
-
-    console.log('[TokenManager] 🏠 Авто-обновление токена запущено (каждые 20ч)');
-
-    // Обновляем сразу при старте
+    console.log('[TokenManager] 🏠 Авто-refresh каждые 20ч');
     refreshAccessToken();
-
-    // Потом каждые 20 часов
     setInterval(refreshAccessToken, REFRESH_INTERVAL_MS);
 }
 
-module.exports = { getCurrentToken, startAutoRefresh };
+async function saveClientCredsToKoyeb(clientId, clientSecret) {
+    process.env.ST_CLIENT_ID     = clientId;
+    process.env.ST_CLIENT_SECRET = clientSecret;
+    await updateKoyebEnv({ ST_CLIENT_ID: clientId, ST_CLIENT_SECRET: clientSecret });
+}
+
+module.exports = {
+    getCurrentToken,
+    startAutoRefresh,
+    exchangeCodeAndSave,
+    createOAuthApp,
+    saveClientCredsToKoyeb,
+    ST_SCOPES,
+};
