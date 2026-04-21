@@ -1196,8 +1196,11 @@ io.on('connection', (socket) => {
 // Все ручки защищены ADMIN_PASSWORD — передавай как ?admin=<пароль>.
 
 function getBaseUrl(req) {
-    return process.env.PUBLIC_BASE_URL
-        || `${req.protocol}://${req.get('host')}`;
+    if (process.env.PUBLIC_BASE_URL) return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
+    const host = req.get('host');
+    // Локально — http, в продакшне — всегда https
+    const proto = (host.includes('localhost') || host.startsWith('127.')) ? 'http' : 'https';
+    return `${proto}://${host}`;
 }
 function checkAdmin(req, res) {
     if (req.query.admin !== ADMIN_PASSWORD) {
