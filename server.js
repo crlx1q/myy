@@ -19,6 +19,7 @@ const fs = require('fs-extra');
 const cron = require('node-cron');
 
 const app = express();
+app.set('trust proxy', true); // Koyeb reverse-proxy: доверяем X-Forwarded-Proto (https)
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
