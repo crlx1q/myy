@@ -241,15 +241,38 @@ async function updateKoyebEnv(updates) {
     }
 
     try {
-        // 1. app_id по имени
+        // Находим service: сначала по app name, потом по service name
+        let service = null;
+
+        // Попытка 1: KOYEB_APP_NAME — это имя App
         const appsRes = await koyebRequest('GET', `/v1/apps?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
         const app = appsRes?.body?.apps?.find(a => a.name === koyebApp) || appsRes?.body?.apps?.[0];
-        if (!app?.id) throw new Error(`Koyeb app "${koyebApp}" не найден`);
+        if (app?.id) {
+            const svcRes = await koyebRequest('GET', `/v1/services?app_id=${app.id}`, null, koyebToken);
+            service = svcRes?.body?.services?.[0];
+        }
 
-        // 2. services этого app
-        const svcRes = await koyebRequest('GET', `/v1/services?app_id=${app.id}`, null, koyebToken);
-        const service = svcRes?.body?.services?.[0];
-        if (!service?.id) throw new Error(`Koyeb services для app "${koyebApp}" не найдены`);
+        // Попытка 2: KOYEB_APP_NAME — это имя Service (частый случай)
+        if (!service) {
+            const allSvc = await koyebRequest('GET', `/v1/services?name=${encodeURIComponent(koyebApp)}`, null, koyebToken);
+            service = allSvc?.body?.services?.find(s => s.name === koyebApp) || allSvc?.body?.services?.[0];
+        }
+
+        // Попытка 3: вообще взять первый service в аккаунте
+        if (!service) {
+            const allSvc = await koyebRequest('GET', '/v1/services?limit=5', null, koyebToken);
+            service = allSvc?.body?.services?.[0];
+            if (service) {
+                console.log(`[TokenManager] ℹ️  App/Service "${koyebApp}" не найден по имени, но нашёлся service: "${service.name}" (id: ${service.id})`);
+            }
+        }
+
+        if (!service?.id) {
+            // Показываем все apps для отладки
+            const debugApps = await koyebRequest('GET', '/v1/apps?limit=10', null, koyebToken);
+            console.error('[TokenManager] Доступные apps:', JSON.stringify(debugApps?.body?.apps?.map(a => a.name)));
+            throw new Error(`Koyeb: не найден ни app, ни service с именем "${koyebApp}". Проверь KOYEB_APP_NAME.`);
+        }
 
         // 3. latest deployment (там — полный definition)
         const deployId = service.latest_deployment_id || service.active_deployment_id;
