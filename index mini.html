@@ -484,51 +484,10 @@
         <div id="devices-list">
             <div class="no-devices">Загрузка...</div>
         </div>
-        
-        <!-- Блок тестирования музыки -->
-        <div style="margin-top: 20px; padding: 15px; background: #111; border-radius: 8px; text-align: center; border: 1px solid #333;">
-            <div style="font-size: 14px; color: #888; margin-bottom: 10px;">Тест музыки (DEF CON Radio)</div>
-            <button id="btn-music" onclick="toggleMusic()" style="width: 100px; padding: 10px; background: #08f; color: #fff; border: none; border-radius: 5px; font-size: 16px; font-weight: bold;">Play</button>
-            <div id="music-status" style="font-size: 11px; color: #666; margin-top: 8px;">Остановлено</div>
-        </div>
-
         <button class="back-btn" onclick="showPage(0)">Назад</button>
     </div>
 
 <script>
-// Аудио плеер
-var audioPlayer = new Audio();
-var isMusicPlaying = false;
-
-function toggleMusic() {
-    var btn = $('btn-music');
-    var status = $('music-status');
-    
-    if (isMusicPlaying) {
-        audioPlayer.pause();
-        audioPlayer.src = '';
-        isMusicPlaying = false;
-        btn.innerHTML = 'Play';
-        btn.style.background = '#08f';
-        status.innerHTML = 'Остановлено';
-    } else {
-        status.innerHTML = 'Буферизация...';
-        // Используем прямую ссылку на HTTP поток интернет радио SomaFM (128 kbps MP3)
-        audioPlayer.src = 'http://ice2.somafm.com/defcon-128-mp3';
-        audioPlayer.play().then(function() {
-            isMusicPlaying = true;
-            btn.innerHTML = 'Stop';
-            btn.style.background = '#f00';
-            status.innerHTML = 'Воспроизведение (MP3 128kbps)';
-        }).catch(function(e) {
-            status.innerHTML = 'Ошибка: ' + e.message;
-            isMusicPlaying = false;
-            btn.innerHTML = 'Play';
-            btn.style.background = '#08f';
-        });
-    }
-}
-
 // Глобальные переменные (var для Android 4)
 var currentPage = 0;
 var devices = [];
