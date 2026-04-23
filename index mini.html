@@ -364,6 +364,17 @@
             opacity: 0.14;
         }
 
+        body.deep-sleep-mini {
+            background-color: #000 !important;
+            background-image: none !important;
+        }
+        body.deep-sleep-mini .page,
+        body.deep-sleep-mini .status-bar,
+        body.deep-sleep-mini .connection-overlay,
+        body.deep-sleep-mini .swipe-hint {
+            display: none !important;
+        }
+
         #mini-pin-overlay {
             position: fixed;
             top: 0;
@@ -676,10 +687,24 @@ function renderDevices() {
     
     var html = '<div class="devices-grid">';
     var rowOpen = false;
+    var displayedCount = 0;
+    var hideList = ['A56', 'A31', 'outlet1 outlet1', 'outlet51', 'S24+', 'outlet39'];
     
     for (var i = 0; i < devices.length; i++) {
         var dev = devices[i];
         if (!dev || !dev.deviceId) continue;
+        
+        var label = dev.label || 'Устройство';
+        
+        // Скрываем указанные устройства
+        var isHidden = false;
+        for (var h = 0; h < hideList.length; h++) {
+            if (label.indexOf(hideList[h]) !== -1) {
+                isHidden = true;
+                break;
+            }
+        }
+        if (isHidden) continue;
         
         var id = dev.deviceId;
         var status = deviceStates[id];
@@ -730,14 +755,13 @@ function renderDevices() {
         }
         
         // Начинаем новую строку каждые 2 устройства
-        if (i % 2 === 0) {
+        if (displayedCount % 2 === 0) {
             if (rowOpen) html += '</div>';
             html += '<div class="devices-row">';
             rowOpen = true;
         }
         
         var divClass = 'device' + (isOn && canToggle ? ' on' : '') + specialClass;
-        var label = dev.label || 'Устройство';
         var icon = getDeviceIcon(dev, status);
         
         // Передопределяем иконку для датчиков
@@ -753,15 +777,21 @@ function renderDevices() {
         html += '<span class="device-status">' + stateText + '</span>';
         html += '</div>';
         
-        // Закрываем строку после второго устройства
-        if (i % 2 === 1 || i === devices.length - 1) {
-            html += '</div>';
-            rowOpen = false;
-        }
+        displayedCount++;
+    }
+    
+    // Закрываем строку, если она осталась открытой
+    if (rowOpen) {
+        html += '</div>';
     }
     
     html += '</div>';
-    list.innerHTML = html;
+    
+    if (displayedCount === 0) {
+        list.innerHTML = '<div class="no-devices">Нет устройств</div>';
+    } else {
+        list.innerHTML = html;
+    }
     
     // Добавляем обработчики кликов
     var divs = list.getElementsByClassName('device');
@@ -958,7 +988,7 @@ function randomInt(min, max) {
 
 function setActivity() {
     lastActivity = new Date().getTime();
-    document.body.className = document.body.className.replace(' burnin-mini', '').replace('burnin-mini', '');
+    document.body.className = document.body.className.replace(' burnin-mini', '').replace('burnin-mini', '').replace(' deep-sleep-mini', '').replace('deep-sleep-mini', '');
     var pages = document.getElementsByClassName('page');
     for (var i = 0; i < pages.length; i++) {
         pages[i].style.left = '0px';
@@ -969,15 +999,27 @@ function setActivity() {
 function checkBurnin() {
     var inactive = (new Date().getTime() - lastActivity) / 1000 / 60;
     if (inactive >= sleepMinutes) {
-        if (document.body.className.indexOf('burnin-mini') === -1) {
-            document.body.className += ' burnin-mini';
-        }
-        var pages = document.getElementsByClassName('page');
-        var dx = randomInt(-10, 10);
-        var dy = randomInt(-10, 10);
-        for (var i = 0; i < pages.length; i++) {
-            pages[i].style.left = dx + 'px';
-            pages[i].style.top = dy + 'px';
+        var d = new Date();
+        var kokshetauHour = (d.getUTCHours() + 5) % 24;
+        var isDeepSleep = (kokshetauHour >= 2 && kokshetauHour < 6);
+
+        if (isDeepSleep) {
+            if (document.body.className.indexOf('deep-sleep-mini') === -1) {
+                document.body.className += ' deep-sleep-mini';
+            }
+            document.body.className = document.body.className.replace(' burnin-mini', '').replace('burnin-mini', '');
+        } else {
+            if (document.body.className.indexOf('burnin-mini') === -1) {
+                document.body.className += ' burnin-mini';
+            }
+            document.body.className = document.body.className.replace(' deep-sleep-mini', '').replace('deep-sleep-mini', '');
+            var pages = document.getElementsByClassName('page');
+            var dx = randomInt(-10, 10);
+            var dy = randomInt(-10, 10);
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].style.left = dx + 'px';
+                pages[i].style.top = dy + 'px';
+            }
         }
     }
 }
