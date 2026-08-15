@@ -1,11 +1,12 @@
 {
   "name": "smart-home-dashboard",
-  "version": "2.0.0",
-  "description": "Smart Home Dashboard — Koyeb-ready (no FS tokens)",
-  "main": "server.js",
+  "version": "2.1.0",
+  "description": "Smart Home Dashboard + мост Tuya OpenAPI <-> SmartThings (Koyeb-ready, no FS tokens)",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node app.js",
+    "dev": "node app.js",
+    "start:legacy": "node server.js"
   },
   "engines": {
     "node": ">=18"
@@ -18,7 +19,7 @@
     "node-fetch": "^2.7.0",
     "socket.io": "^4.6.1"
   },
-  "keywords": ["smart-home", "dashboard", "smartthings", "koyeb"],
+  "keywords": ["smart-home", "dashboard", "smartthings", "tuya", "koyeb"],
   "author": "",
   "license": "ISC"
 }
