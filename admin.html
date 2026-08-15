@@ -3,18 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel</title>
+  <title>Admin Panel — Мост Tuya ⇄ SmartThings</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#0b0b0b; color:#fff; margin:0; padding:24px; }
-    .card { max-width:480px; margin:30px auto; background:#1a1a1a; border:1px solid #333; border-radius:12px; padding:20px; }
-    input,button { width:100%; box-sizing:border-box; margin-top:10px; padding:12px; border-radius:8px; border:1px solid #333; }
-    input { background:#111; color:#fff; }
-    button { background:#2563eb; color:#fff; border:none; cursor:pointer; }
+    body { font-family: -apple-system, Segoe UI, Arial, sans-serif; background:#0b0b0b; color:#fff; margin:0; padding:24px; }
+    .card { max-width:720px; margin:24px auto; background:#1a1a1a; border:1px solid #333; border-radius:12px; padding:20px; }
+    h2 { margin-top:0; font-size:18px; }
+    h3 { font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:#9ca3af; margin:22px 0 8px; }
+    input, button, select { width:100%; box-sizing:border-box; margin-top:10px; padding:12px; border-radius:8px; border:1px solid #333; font-size:14px; }
+    input, select { background:#111; color:#fff; }
+    button { background:#2563eb; color:#fff; border:none; cursor:pointer; font-weight:600; }
+    button.secondary { background:#374151; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; }
+    .row > * { flex:1 1 220px; }
     .hidden { display:none; }
     .muted { color:#aaa; font-size:12px; }
+    label.field { display:block; margin-top:12px; font-size:12px; color:#9ca3af; }
+    .status { display:flex; align-items:center; gap:10px; padding:12px; border-radius:10px; background:#111; border:1px solid #333; margin-top:10px; }
+    .dot { width:12px; height:12px; border-radius:50%; background:#6b7280; flex:0 0 auto; }
+    .dot.ok { background:#22c55e; box-shadow:0 0 10px #22c55e88; }
+    .dot.bad { background:#ef4444; box-shadow:0 0 10px #ef444488; }
+    .dot.warn { background:#f59e0b; }
+    pre#syncLog { background:#050505; border:1px solid #333; border-radius:10px; padding:12px; height:240px; overflow:auto; font-size:12px; line-height:1.5; margin-top:10px; white-space:pre-wrap; }
+    .log-error { color:#f87171; }
+    .log-warn { color:#fbbf24; }
+    .log-info { color:#93c5fd; }
+    .kv { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #222; font-size:13px; }
   </style>
 </head>
 <body>
+  <!-- ЛОГИН -->
   <div class="card" id="loginCard">
     <h2>Админ панель</h2>
     <p class="muted">Введите пароль администратора.</p>
@@ -23,6 +41,7 @@
     <p id="loginError" class="muted hidden" style="color:#f87171;">Неверный пароль</p>
   </div>
 
+  <!-- БЕЗОПАСНОСТЬ -->
   <div class="card hidden" id="panelCard">
     <h2>Безопасность дашборда</h2>
     <label><input id="requirePin" type="checkbox" style="width:auto; margin-right:8px;">Требовать PIN для Index / Index Mini</label>
@@ -31,43 +50,248 @@
     <p id="saveStatus" class="muted"></p>
   </div>
 
+  <!-- СТАТУС МОСТА -->
+  <div class="card hidden" id="bridgeStatusCard">
+    <h2>Мост Tuya ⇄ SmartThings</h2>
+
+    <div class="status"><span class="dot" id="dotBridge"></span><div>
+      <div id="bridgeStateText">Загрузка…</div>
+      <div class="muted">Последняя синхронизация: <span id="lastSyncText">—</span> · интервал: <span id="intervalText">—</span> мин</div>
+    </div></div>
+
+    <div class="row">
+      <div class="status"><span class="dot" id="dotTuya"></span><div><b>Tuya OpenAPI</b><div class="muted" id="tuyaText">—</div></div></div>
+      <div class="status"><span class="dot" id="dotSt"></span><div><b>SmartThings</b><div class="muted" id="stText">—</div></div></div>
+    </div>
+
+    <h3>Текущие значения</h3>
+    <div class="kv"><span>Температура</span><span id="valTemp">—</span></div>
+    <div class="kv"><span>LED-лента</span><span id="valLed">—</span></div>
+    <div class="kv"><span>Дверной звонок</span><span id="valDoorbell">—</span></div>
+
+    <div class="row">
+      <button onclick="runHealthCheck()" id="btnHealth">Проверить подключение</button>
+      <button onclick="syncNow()" id="btnSync" class="secondary">Синхронизировать сейчас</button>
+    </div>
+
+    <h3>Логи в реальном времени</h3>
+    <pre id="syncLog"></pre>
+  </div>
+
+  <!-- КЛЮЧИ -->
+  <div class="card hidden" id="keysCard">
+    <h2>API-ключи и устройства</h2>
+    <p class="muted">Пустое поле = использовать значение из <code>.env</code> / defaults. Секреты показаны маской.</p>
+
+    <h3>Tuya OpenAPI</h3>
+    <label class="field">TUYA_CLIENT_ID<input id="TUYA_CLIENT_ID" placeholder="3efgnhtc…" /></label>
+    <label class="field">TUYA_CLIENT_SECRET<input id="TUYA_CLIENT_SECRET" type="password" placeholder="не изменять — оставить пустым" /></label>
+    <label class="field">TUYA_ENDPOINT<input id="TUYA_ENDPOINT" placeholder="https://openapi.tuyaeu.com" /></label>
+    <label class="field">TUYA_PROJECT_CODE<input id="TUYA_PROJECT_CODE" /></label>
+
+    <h3>Устройства Tuya</h3>
+    <label class="field">Датчик температуры (TUYA_TEMP_DEVICE_ID)<input id="TUYA_TEMP_DEVICE_ID" /></label>
+    <label class="field">LED-лента (TUYA_LED_DEVICE_ID)<input id="TUYA_LED_DEVICE_ID" /></label>
+    <label class="field">Дверной звонок (TUYA_DOORBELL_DEVICE_ID)<input id="TUYA_DOORBELL_DEVICE_ID" /></label>
+
+    <h3>SmartThings</h3>
+    <label class="field">ST_PAT_TOKEN<input id="ST_PAT_TOKEN" type="password" placeholder="Personal Access Token" /></label>
+    <label class="field">Виртуальный термометр (ST_TEMP_DEVICE_ID)<input id="ST_TEMP_DEVICE_ID" /></label>
+    <label class="field">Виртуальный свет (ST_LED_DEVICE_ID)<input id="ST_LED_DEVICE_ID" /></label>
+    <label class="field">Виртуальный звонок (ST_DOORBELL_DEVICE_ID)<input id="ST_DOORBELL_DEVICE_ID" /></label>
+
+    <h3>Синхронизация</h3>
+    <label class="field">Интервал, минут (SYNC_INTERVAL_MINUTES)<input id="SYNC_INTERVAL_MINUTES" type="number" min="1" /></label>
+    <label class="field">Масштаб температуры (TUYA_TEMP_SCALE)
+      <select id="TUYA_TEMP_SCALE">
+        <option value="auto">auto</option>
+        <option value="1">1</option>
+        <option value="10">10</option>
+        <option value="100">100</option>
+      </select>
+    </label>
+    <label class="field">Мост включён (BRIDGE_ENABLED)
+      <select id="BRIDGE_ENABLED"><option value="true">true</option><option value="false">false</option></select>
+    </label>
+
+    <button onclick="saveKeys()" id="btnSaveKeys">Сохранить ключи</button>
+    <p id="keysStatus" class="muted"></p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     var adminPassword = '';
+    var KEY_FIELDS = [
+      'TUYA_CLIENT_ID','TUYA_CLIENT_SECRET','TUYA_ENDPOINT','TUYA_PROJECT_CODE',
+      'TUYA_TEMP_DEVICE_ID','TUYA_LED_DEVICE_ID','TUYA_DOORBELL_DEVICE_ID',
+      'ST_PAT_TOKEN','ST_TEMP_DEVICE_ID','ST_LED_DEVICE_ID','ST_DOORBELL_DEVICE_ID',
+      'SYNC_INTERVAL_MINUTES','TUYA_TEMP_SCALE','BRIDGE_ENABLED'
+    ];
+    var SECRETS = ['TUYA_CLIENT_SECRET','ST_PAT_TOKEN'];
+
+    function $(id) { return document.getElementById(id); }
 
     function verifyAdmin() {
-      adminPassword = (document.getElementById('adminPassword').value || '').trim();
+      adminPassword = ($('adminPassword').value || '').trim();
       fetch('/api/admin/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: adminPassword })
-      }).then(function(r){
+      }).then(function (r) {
         if (!r.ok) throw new Error('auth');
         return fetch('/api/settings');
-      }).then(function(r){ return r.json(); }).then(function(settings){
-        document.getElementById('loginCard').classList.add('hidden');
-        document.getElementById('panelCard').classList.remove('hidden');
-        document.getElementById('requirePin').checked = !!settings.requireDashboardPin;
-        document.getElementById('dashboardPin').value = settings.dashboardPin || '';
-      }).catch(function(){
-        document.getElementById('loginError').classList.remove('hidden');
+      }).then(function (r) { return r.json(); }).then(function (settings) {
+        $('loginCard').classList.add('hidden');
+        ['panelCard','bridgeStatusCard','keysCard'].forEach(function (id) { $(id).classList.remove('hidden'); });
+        $('requirePin').checked = !!settings.requireDashboardPin;
+        $('dashboardPin').value = settings.dashboardPin || '';
+        loadKeys();
+        loadStatus();
+        loadLogs();
+        connectSocket();
+      }).catch(function () {
+        $('loginError').classList.remove('hidden');
       });
     }
 
     function savePinConfig() {
-      var requireDashboardPin = document.getElementById('requirePin').checked;
-      var dashboardPin = (document.getElementById('dashboardPin').value || '').trim();
       fetch('/api/admin/pin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword, requireDashboardPin: requireDashboardPin, dashboardPin: dashboardPin })
-      }).then(function(r){
-        if (!r.ok) return r.json().then(function(data){ throw new Error(data.error || 'save error'); });
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: adminPassword,
+          requireDashboardPin: $('requirePin').checked,
+          dashboardPin: ($('dashboardPin').value || '').trim()
+        })
+      }).then(function (r) {
+        if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || 'save error'); });
         return r.json();
-      }).then(function(){
-        document.getElementById('saveStatus').textContent = 'Сохранено';
-      }).catch(function(err){
-        document.getElementById('saveStatus').textContent = err.message;
+      }).then(function () { $('saveStatus').textContent = 'Сохранено'; })
+        .catch(function (err) { $('saveStatus').textContent = err.message; });
+    }
+
+    // ---------- Ключи ----------
+    function loadKeys() {
+      fetch('/api/settings/keys').then(function (r) { return r.json(); }).then(function (data) {
+        var keys = (data && data.keys) || {};
+        KEY_FIELDS.forEach(function (field) {
+          var el = $(field);
+          if (!el) return;
+          if (SECRETS.indexOf(field) >= 0) {
+            el.placeholder = keys[field] ? 'Сохранено: ' + keys[field] : 'Не задан';
+            el.value = '';
+          } else {
+            el.value = keys[field] || '';
+          }
+        });
       });
+    }
+
+    function saveKeys() {
+      var payload = { password: adminPassword };
+      KEY_FIELDS.forEach(function (field) {
+        var el = $(field);
+        if (!el) return;
+        var value = (el.value || '').trim();
+        if (SECRETS.indexOf(field) >= 0 && !value) return; // не перетираем секрет пустым значением
+        payload[field] = value;
+      });
+
+      $('btnSaveKeys').disabled = true;
+      fetch('/api/settings/keys', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        $('keysStatus').textContent = data.success ? 'Ключи сохранены, планировщик перезапущен' : ('Ошибка: ' + data.error);
+        loadKeys();
+        loadStatus();
+      }).catch(function (err) {
+        $('keysStatus').textContent = 'Ошибка: ' + err.message;
+      }).then(function () { $('btnSaveKeys').disabled = false; });
+    }
+
+    // ---------- Статус ----------
+    function fmtTime(iso) {
+      if (!iso) return '—';
+      try { return new Date(iso).toLocaleString('ru-RU'); } catch (e) { return iso; }
+    }
+
+    function setDot(id, ok, warn) {
+      var el = $(id);
+      el.className = 'dot ' + (warn ? 'warn' : (ok ? 'ok' : 'bad'));
+    }
+
+    function renderStatus(state) {
+      if (!state) return;
+      var healthy = state.tuya && state.tuya.connected && (!state.lastError);
+      setDot('dotBridge', healthy, state.running);
+      $('bridgeStateText').textContent = state.running
+        ? 'Синхронизация выполняется…'
+        : (healthy ? 'Фоновая синхронизация активна' : ('Проблема: ' + (state.lastError || (state.tuya && state.tuya.error) || 'нет данных')));
+      $('lastSyncText').textContent = fmtTime(state.lastSyncAt);
+      $('intervalText').textContent = state.intervalMinutes;
+
+      setDot('dotTuya', !!(state.tuya && state.tuya.connected));
+      $('tuyaText').textContent = state.tuya && state.tuya.connected ? 'Подключено' : ((state.tuya && state.tuya.error) || 'нет данных');
+      setDot('dotSt', !!(state.smartthings && state.smartthings.connected));
+      $('stText').textContent = state.smartthings && state.smartthings.connected ? 'Подключено' : ((state.smartthings && state.smartthings.error) || 'нет данных');
+
+      var d = state.devices || {};
+      var t = d.temperature || {};
+      var l = d.led || {};
+      var b = d.doorbell || {};
+      $('valTemp').textContent = (t.value !== null && t.value !== undefined ? t.value + ' °C' : '—') + (t.error ? ' · ' + t.error : '');
+      $('valLed').textContent = (l.on === null || l.on === undefined ? '—' : (l.on ? 'вкл' : 'выкл')) + (l.level !== null && l.level !== undefined ? ' · ' + l.level + '%' : '') + (l.error ? ' · ' + l.error : '');
+      $('valDoorbell').textContent = (b.hasSnapshot ? 'кадр от ' + fmtTime(b.snapshotAt) : 'кадров нет') + (b.error ? ' · ' + b.error : '');
+    }
+
+    function loadStatus() {
+      fetch('/api/bridge/status').then(function (r) { return r.json(); }).then(renderStatus).catch(function () {});
+    }
+
+    // ---------- Логи ----------
+    function appendLog(entry) {
+      var pre = $('syncLog');
+      var time = new Date(entry.time).toLocaleTimeString('ru-RU');
+      var line = document.createElement('div');
+      line.className = 'log-' + (entry.level || 'info');
+      line.textContent = '[' + time + '] ' + entry.message;
+      pre.appendChild(line);
+      pre.scrollTop = pre.scrollHeight;
+    }
+
+    function loadLogs() {
+      fetch('/api/bridge/logs?limit=50').then(function (r) { return r.json(); }).then(function (data) {
+        $('syncLog').innerHTML = '';
+        (data.logs || []).forEach(appendLog);
+      }).catch(function () {});
+    }
+
+    function connectSocket() {
+      if (typeof io === 'undefined') return;
+      var socket = io();
+      socket.on('connect', function () { socket.emit('bridge-request-state'); });
+      socket.on('bridge-update', renderStatus);
+      socket.on('bridge-log', appendLog);
+      socket.on('bridge-sync-start', function () { $('btnSync').disabled = true; });
+      socket.on('bridge-sync-end', function (state) { $('btnSync').disabled = false; renderStatus(state); });
+    }
+
+    // ---------- Действия ----------
+    function runHealthCheck() {
+      $('btnHealth').disabled = true;
+      fetch('/api/bridge/health', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) })
+        .then(function (r) { return r.json(); })
+        .then(function () { loadStatus(); })
+        .catch(function () {})
+        .then(function () { $('btnHealth').disabled = false; });
+    }
+
+    function syncNow() {
+      $('btnSync').disabled = true;
+      fetch('/api/sync/now', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) })
+        .then(function (r) { return r.json(); })
+        .then(function (data) { renderStatus(data.state); })
+        .catch(function () {})
+        .then(function () { $('btnSync').disabled = false; });
     }
   </script>
 </body>
