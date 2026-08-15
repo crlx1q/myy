@@ -1,11 +1,11 @@
 // ==========================================
 // bridge/index.js
-// Точка интеграции моста в server.js:
+// Точка интеграции моста:
 //
 //   const { initBridge } = require('./bridge');
 //   initBridge({ app, io });
 //
-// Регистрирует REST API, WebSocket-события и фоновый планировщик.
+// При запуске через app.js это делается автоматически.
 // ==========================================
 
 const fs = require('fs-extra');
@@ -15,6 +15,7 @@ const config = require('./config-store');
 const tuya = require('./tuya');
 const smartthings = require('./smartthings');
 const engine = require('./sync-engine');
+const reverse = require('./reverse-sync');
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '651956';
 
@@ -33,12 +34,33 @@ function buildRouter() {
 
     // ---------- Статус моста ----------
     router.get('/api/bridge/status', (req, res) => {
-        res.json({ success: true, ...engine.getPublicState() });
+        res.json({ success: true, ...engine.getPublicState(), reverseSync: reverse.getState() });
     });
 
     router.get('/api/bridge/logs', (req, res) => {
         const limit = Math.min(200, Number(req.query.limit) || 100);
         res.json({ success: true, logs: engine.getLogs(limit) });
+    });
+
+    // ---------- Диагностика ----------
+    router.get('/api/bridge/diagnostics', async (req, res) => {
+        try {
+            const [tuyaResult, stResult, stDevices] = await Promise.all([
+                tuya.healthCheck(),
+                smartthings.healthCheck(),
+                smartthings.diagnose().catch((error) => ({ error: error.message }))
+            ]);
+            res.json({
+                success: true,
+                tuya: tuyaResult,
+                smartthings: stResult,
+                smartthingsDevices: stDevices,
+                reverseSync: reverse.getState(),
+                keys: config.getMasked()
+            });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
     });
 
     // ---------- Ручная синхронизация ----------
@@ -52,22 +74,16 @@ function buildRouter() {
     });
 
     // ---------- Health check ----------
-    router.post('/api/bridge/health', async (req, res) => {
+    const health = async (req, res) => {
         try {
             const result = await engine.healthCheck();
             res.json({ success: true, ...result });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
         }
-    });
-    router.get('/api/bridge/health', async (req, res) => {
-        try {
-            const result = await engine.healthCheck();
-            res.json({ success: true, ...result });
-        } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
-        }
-    });
+    };
+    router.post('/api/bridge/health', health);
+    router.get('/api/bridge/health', health);
 
     // ---------- Ключи и настройки ----------
     router.get('/api/settings/keys', (req, res) => {
@@ -81,9 +97,9 @@ function buildRouter() {
             delete payload.password;
             const keys = config.save(payload);
 
-            // Учётные данные могли измениться — сбрасываем кеш токена и перезапускаем планировщик
             tuya.invalidateToken();
             engine.startScheduler();
+            reverse.start();
             engine.log('info', 'Ключи обновлены через админ-панель');
 
             res.json({ success: true, keys });
@@ -134,7 +150,6 @@ function initBridge({ app, io } = {}) {
     if (io) {
         engine.setSocketServer(io);
         io.on('connection', (socket) => {
-            // Сразу отдаём текущее состояние моста новому клиенту
             socket.emit('bridge-update', engine.getPublicState());
 
             socket.on('bridge-request-state', () => {
@@ -157,9 +172,10 @@ function initBridge({ app, io } = {}) {
     }
 
     engine.startScheduler();
+    reverse.start();
     engine.log('info', 'Мост Tuya <-> SmartThings инициализирован');
 
-    return { config, tuya, smartthings, engine };
+    return { config, tuya, smartthings, engine, reverse };
 }
 
 module.exports = {
@@ -167,5 +183,6 @@ module.exports = {
     config,
     tuya,
     smartthings,
-    engine
+    engine,
+    reverse
 };

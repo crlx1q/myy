@@ -2,12 +2,15 @@
 // bridge/html-inject.js
 // Отдаёт index.html с автоматически вставленными скриптами моста,
 // чтобы не редактировать 60+ КБ разметки вручную.
+//
+// ВАЖНО: "index mini.html" сознательно НЕ в списке — мини-экран остаётся
+// чистым, без панели и скриптов моста.
 // ==========================================
 
 const fs = require('fs');
 const path = require('path');
 
-const DEFAULT_TARGETS = ['/', '/index.html', '/index mini.html'];
+const DEFAULT_TARGETS = ['/', '/index.html'];
 
 const SNIPPET = [
     '<!-- Tuya <-> SmartThings bridge (вставлено автоматически) -->',
@@ -46,7 +49,6 @@ function injectClientScript(options = {}) {
         const fileName = reqPath === '/' ? 'index.html' : reqPath.replace(/^\//, '');
         const absolute = path.join(rootDir, fileName);
 
-        // Защита от выхода за пределы каталога проекта
         if (!absolute.startsWith(path.resolve(rootDir))) return next();
 
         fs.readFile(absolute, 'utf8', (err, html) => {
