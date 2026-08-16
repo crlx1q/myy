@@ -6,7 +6,7 @@
   <title>Admin Panel</title>
   <style>
     body { font-family: Arial, sans-serif; background:#0b0b0b; color:#fff; margin:0; padding:24px; }
-    .card { max-width:560px; margin:24px auto; background:#1a1a1a; border:1px solid #333; border-radius:12px; padding:20px; }
+    .card { max-width:560px; margin:30px auto; background:#1a1a1a; border:1px solid #333; border-radius:12px; padding:20px; }
     input,button,select { width:100%; box-sizing:border-box; margin-top:10px; padding:12px; border-radius:8px; border:1px solid #333; }
     input,select { background:#111; color:#fff; }
     button { background:#2563eb; color:#fff; border:none; cursor:pointer; }
@@ -14,13 +14,13 @@
     .hidden { display:none; }
     .muted { color:#aaa; font-size:12px; }
     .row { display:flex; gap:10px; }
-    .row > * { flex:1; }
-    label.field { display:block; margin-top:12px; font-size:12px; color:#aaa; }
-    .head { display:flex; align-items:center; gap:10px; }
-    .dot { width:10px; height:10px; border-radius:50%; background:#ef4444; flex:0 0 auto; }
+    .row button { flex:1; }
+    label.field { display:block; margin-top:14px; font-size:13px; color:#ddd; }
+    .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:#6b7280; margin-right:6px; vertical-align:middle; }
     .dot.ok { background:#22c55e; }
-    pre.logs { background:#0e0e0e; border:1px solid #262626; border-radius:8px; padding:10px; height:200px; overflow:auto; font-size:11px; white-space:pre-wrap; margin-top:12px; }
-    .kv { font-size:12px; color:#ccc; margin-top:8px; line-height:1.6; }
+    .dot.bad { background:#ef4444; }
+    #tuyaLogs { background:#050505; border:1px solid #333; border-radius:8px; padding:10px; margin-top:12px;
+                font-family:monospace; font-size:11px; white-space:pre-wrap; max-height:220px; overflow:auto; color:#cbd5e1; }
   </style>
 </head>
 <body>
@@ -40,74 +40,66 @@
     <p id="saveStatus" class="muted"></p>
   </div>
 
-  <div class="card hidden" id="bridgeCard">
-    <div class="head">
-      <span class="dot" id="bridgeDot"></span>
-      <h2 style="margin:0;">Мост Tuya</h2>
-    </div>
-    <p class="muted" id="bridgeSummary">Загрузка…</p>
+  <div class="card hidden" id="tuyaCard">
+    <h2>Tuya Cloud</h2>
+    <p class="muted">Устройства дашборда берутся из Tuya (Smart Life). Пустое поле = значение из переменных окружения / кода.</p>
+    <p id="tuyaState"><span class="dot" id="tuyaDot"></span><span id="tuyaStateText" class="muted">состояние неизвестно</span></p>
 
-    <label class="field">TUYA_CLIENT_ID</label>
-    <input id="k_TUYA_CLIENT_ID" />
+    <label class="field">Client ID (Access ID)</label>
+    <input id="TUYA_CLIENT_ID" type="text" placeholder="Access ID проекта" />
 
-    <label class="field">TUYA_CLIENT_SECRET (пустое поле = оставить текущий)</label>
-    <input id="k_TUYA_CLIENT_SECRET" type="password" placeholder="••••••••" />
+    <label class="field">Client Secret (Access Secret)</label>
+    <input id="TUYA_CLIENT_SECRET" type="password" placeholder="оставь пустым, чтобы не менять" />
 
-    <label class="field">TUYA_ENDPOINT</label>
-    <input id="k_TUYA_ENDPOINT" />
-
-    <label class="field">TUYA_PROJECT_CODE</label>
-    <input id="k_TUYA_PROJECT_CODE" />
-
-    <label class="field">ID датчика температуры</label>
-    <input id="k_TUYA_TEMP_DEVICE_ID" />
-
-    <label class="field">ID LED-ленты</label>
-    <input id="k_TUYA_LED_DEVICE_ID" />
-
-    <label class="field">ID дверного звонка</label>
-    <input id="k_TUYA_DOORBELL_DEVICE_ID" />
-
-    <div class="row">
-      <div>
-        <label class="field">Интервал, мин</label>
-        <input id="k_SYNC_INTERVAL_MINUTES" type="number" min="1" />
-      </div>
-      <div>
-        <label class="field">Масштаб температуры</label>
-        <select id="k_TUYA_TEMP_SCALE">
-          <option value="auto">auto</option>
-          <option value="1">1</option>
-          <option value="10">10</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-    </div>
-
-    <label class="field">Код яркости</label>
-    <select id="k_TUYA_BRIGHT_CODE">
-      <option value="auto">auto</option>
-      <option value="bright_value">bright_value</option>
-      <option value="bright_value_v2">bright_value_v2</option>
+    <label class="field">Дата-центр (endpoint)</label>
+    <select id="TUYA_ENDPOINT">
+      <option value="https://openapi.tuyaeu.com">Europe — openapi.tuyaeu.com</option>
+      <option value="https://openapi.tuyaus.com">America — openapi.tuyaus.com</option>
+      <option value="https://openapi.tuyacn.com">China — openapi.tuyacn.com</option>
+      <option value="https://openapi.tuyain.com">India — openapi.tuyain.com</option>
     </select>
 
-    <button onclick="saveKeys()">Сохранить ключи</button>
-    <div class="row">
-      <button class="secondary" onclick="checkHealth()">Проверить подключение</button>
-      <button onclick="syncNow()">Синхронизировать сейчас</button>
-    </div>
+    <label class="field">UID аккаунта Smart Life (все устройства аккаунта)</label>
+    <input id="TUYA_UID" type="text" placeholder="eu16... (необязательно)" />
 
-    <div class="kv" id="bridgeState"></div>
-    <pre class="logs" id="bridgeLogs"></pre>
-    <p class="muted">На Koyeb файловая система стирается при деплое — постоянные значения держите в переменных окружения.</p>
+    <label class="field">Датчик температуры — device_id</label>
+    <input id="TUYA_TEMP_DEVICE_ID" type="text" />
+
+    <label class="field">Лампа / лента — device_id</label>
+    <input id="TUYA_LED_DEVICE_ID" type="text" />
+
+    <label class="field">Дверной звонок — device_id</label>
+    <input id="TUYA_DOORBELL_DEVICE_ID" type="text" />
+
+    <label class="field">Датчик дыма — device_id</label>
+    <input id="TUYA_SMOKE_DEVICE_ID" type="text" placeholder="если пусто — ищется автоматически" />
+
+    <label class="field">Другие устройства (device_id через запятую)</label>
+    <input id="TUYA_DEVICE_IDS" type="text" />
+
+    <label class="field">Делитель температуры</label>
+    <select id="TUYA_TEMP_SCALE">
+      <option value="auto">auto — определять автоматически</option>
+      <option value="1">1 — значение как есть</option>
+      <option value="10">10 — 288 → 28.8</option>
+      <option value="100">100 — 2880 → 28.8</option>
+    </select>
+
+    <button onclick="saveTuyaKeys()">Сохранить ключи</button>
+    <div class="row">
+      <button class="secondary" onclick="checkTuya()">Проверить подключение</button>
+      <button class="secondary" onclick="resyncTuya()">Обновить устройства</button>
+    </div>
+    <p id="tuyaStatus" class="muted"></p>
+    <div id="tuyaLogs">Логи Tuya появятся здесь…</div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
   <script>
     var adminPassword = '';
-    var KEY_FIELDS = ['TUYA_CLIENT_ID','TUYA_CLIENT_SECRET','TUYA_ENDPOINT','TUYA_PROJECT_CODE',
-      'TUYA_TEMP_DEVICE_ID','TUYA_LED_DEVICE_ID','TUYA_DOORBELL_DEVICE_ID',
-      'SYNC_INTERVAL_MINUTES','TUYA_TEMP_SCALE','TUYA_BRIGHT_CODE'];
+    var TUYA_FIELDS = ['TUYA_CLIENT_ID','TUYA_CLIENT_SECRET','TUYA_ENDPOINT','TUYA_UID',
+                       'TUYA_TEMP_DEVICE_ID','TUYA_LED_DEVICE_ID','TUYA_DOORBELL_DEVICE_ID',
+                       'TUYA_SMOKE_DEVICE_ID','TUYA_DEVICE_IDS','TUYA_TEMP_SCALE'];
+    var logsTimer = null;
 
     function verifyAdmin() {
       adminPassword = (document.getElementById('adminPassword').value || '').trim();
@@ -121,13 +113,12 @@
       }).then(function(r){ return r.json(); }).then(function(settings){
         document.getElementById('loginCard').classList.add('hidden');
         document.getElementById('panelCard').classList.remove('hidden');
-        document.getElementById('bridgeCard').classList.remove('hidden');
+        document.getElementById('tuyaCard').classList.remove('hidden');
         document.getElementById('requirePin').checked = !!settings.requireDashboardPin;
         document.getElementById('dashboardPin').value = settings.dashboardPin || '';
-        loadKeys();
-        loadState();
-        loadLogs();
-        connectSocket();
+        loadTuyaKeys();
+        refreshTuyaStatus();
+        if (!logsTimer) logsTimer = setInterval(refreshTuyaStatus, 10000);
       }).catch(function(){
         document.getElementById('loginError').classList.remove('hidden');
       });
@@ -150,108 +141,94 @@
       });
     }
 
-    // ---------- Мост ----------
-    function loadKeys() {
-      fetch('/api/settings/keys').then(function(r){ return r.json(); }).then(function(data){
-        var keys = (data && data.keys) || {};
-        KEY_FIELDS.forEach(function(key){
-          var el = document.getElementById('k_' + key);
-          if (!el) return;
-          if (key === 'TUYA_CLIENT_SECRET') { el.placeholder = keys[key] || '••••••••'; return; }
-          el.value = keys[key] || '';
+    function loadTuyaKeys() {
+      fetch('/api/tuya/keys?password=' + encodeURIComponent(adminPassword))
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.success) return;
+          TUYA_FIELDS.forEach(function(key){
+            var el = document.getElementById(key);
+            if (!el) return;
+            if (key === 'TUYA_CLIENT_SECRET') {
+              el.placeholder = data.keys[key] ? ('сейчас: ' + data.keys[key]) : 'не задан';
+              return;
+            }
+            el.value = data.keys[key] || '';
+          });
         });
-      }).catch(function(){});
     }
 
-    function saveKeys() {
+    function saveTuyaKeys() {
       var payload = { password: adminPassword };
-      KEY_FIELDS.forEach(function(key){
-        var el = document.getElementById('k_' + key);
-        if (!el) return;
-        var value = (el.value || '').trim();
-        if (key === 'TUYA_CLIENT_SECRET' && !value) return; // не затираем секрет
-        payload[key] = value;
+      TUYA_FIELDS.forEach(function(key){
+        var el = document.getElementById(key);
+        if (el) payload[key] = (el.value || '').trim();
       });
-
-      fetch('/api/settings/keys', {
+      document.getElementById('tuyaStatus').textContent = 'Сохраняю…';
+      fetch('/api/tuya/keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       }).then(function(r){ return r.json(); }).then(function(data){
-        appendLog(data.success ? 'Ключи сохранены' : ('Ошибка: ' + (data.error || '')));
-        loadKeys();
-      }).catch(function(err){ appendLog('Ошибка сохранения: ' + err.message); });
+        if (!data.success) throw new Error(data.error || 'ошибка сохранения');
+        document.getElementById('TUYA_CLIENT_SECRET').value = '';
+        document.getElementById('tuyaStatus').textContent = 'Ключи сохранены, переподключаюсь…';
+        loadTuyaKeys();
+        setTimeout(checkTuya, 1500);
+      }).catch(function(err){
+        document.getElementById('tuyaStatus').textContent = 'Ошибка: ' + err.message;
+      });
     }
 
-    function checkHealth() {
-      appendLog('Проверка подключения…');
-      fetch('/api/bridge/health').then(function(r){ return r.json(); }).then(function(data){
-        var tuya = data.tuya || {};
-        appendLog('Tuya: ' + (tuya.ok ? 'OK (' + tuya.latencyMs + ' мс)' : 'ОШИБКА — ' + tuya.error));
-        Object.keys(data.devices || {}).forEach(function(name){
-          var d = data.devices[name];
-          appendLog('  ' + name + ': ' + (d.ok ? ((d.name || d.deviceId) + (d.online ? ' — online' : ' — offline')) : ('ОШИБКА — ' + d.error)));
+    function checkTuya() {
+      document.getElementById('tuyaStatus').textContent = 'Проверяю подключение…';
+      fetch('/api/tuya/health', { method: 'POST' })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          setDot(data.ok);
+          document.getElementById('tuyaStatus').textContent = data.ok
+            ? ('Подключение в порядке. Устройств: ' + data.devices + ' (' + data.tookMs + ' мс)')
+            : ('Не подключилось: ' + data.error);
+          refreshTuyaStatus();
+        }).catch(function(err){
+          setDot(false);
+          document.getElementById('tuyaStatus').textContent = 'Ошибка: ' + err.message;
         });
-        setDot(Boolean(tuya.ok));
-      }).catch(function(err){ appendLog('Ошибка проверки: ' + err.message); });
     }
 
-    function syncNow() {
-      appendLog('Запуск синхронизации…');
-      fetch('/api/sync/now', { method: 'POST' }).then(function(r){ return r.json(); }).then(function(data){
-        if (data.state) renderState(data.state);
-        setDot(data.success !== false);
-      }).catch(function(err){ appendLog('Ошибка синхронизации: ' + err.message); });
-    }
-
-    function loadState() {
-      fetch('/api/bridge/status').then(function(r){ return r.json(); }).then(renderState).catch(function(){});
-    }
-
-    function loadLogs() {
-      fetch('/api/bridge/logs?limit=80').then(function(r){ return r.json(); }).then(function(data){
-        (data.logs || []).forEach(function(entry){ appendLog(entry.message, entry.ts); });
-      }).catch(function(){});
+    function resyncTuya() {
+      document.getElementById('tuyaStatus').textContent = 'Обновляю список устройств…';
+      fetch('/api/tuya/refresh', { method: 'POST' })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          document.getElementById('tuyaStatus').textContent = data.success
+            ? ('Готово. Устройств на дашборде: ' + data.devices)
+            : ('Ошибка: ' + data.error);
+          refreshTuyaStatus();
+        });
     }
 
     function setDot(ok) {
-      document.getElementById('bridgeDot').classList.toggle('ok', Boolean(ok));
+      var dot = document.getElementById('tuyaDot');
+      dot.className = 'dot ' + (ok ? 'ok' : 'bad');
     }
 
-    function fmt(iso) {
-      if (!iso) return '—';
-      try { return new Date(iso).toLocaleString('ru-RU'); } catch (e) { return iso; }
-    }
+    function refreshTuyaStatus() {
+      fetch('/api/tuya/status').then(function(r){ return r.json(); }).then(function(data){
+        var cloud = data.cloud || {};
+        setDot(!cloud.lastError && data.devices > 0);
+        document.getElementById('tuyaStateText').textContent =
+          'устройств: ' + data.devices +
+          ' • токен: ' + (cloud.hasToken ? 'есть' : 'нет') +
+          (cloud.uid ? (' • uid: ' + cloud.uid) : '') +
+          (cloud.lastError ? (' • ' + cloud.lastError) : '');
 
-    function renderState(state) {
-      if (!state) return;
-      var temp = state.temperature || {};
-      var led = state.led || {};
-      var bell = state.doorbell || {};
-      document.getElementById('bridgeSummary').textContent =
-        'Синхронизация каждые ' + (state.intervalMinutes || '?') + ' мин.';
-      document.getElementById('bridgeState').innerHTML =
-        'Температура: <b>' + (temp.value !== null && temp.value !== undefined ? temp.value + '\u00b0C' : '—') + '</b><br>' +
-        'Лента: <b>' + (led.on === null || led.on === undefined ? '—' : (led.on ? 'вкл' : 'выкл')) +
-        (led.level !== null && led.level !== undefined ? ', ' + led.level + '%' : '') + '</b><br>' +
-        'Звонок: <b>' + (bell.updatedAt ? fmt(bell.updatedAt) : 'кадров нет') + '</b><br>' +
-        'Последняя удачная синхронизация: <b>' + fmt(state.lastSuccessAt) + '</b>' +
-        (state.lastError ? '<br><span style="color:#f87171;">' + state.lastError + '</span>' : '');
-      setDot(!state.lastError && state.lastSuccessAt);
-    }
-
-    function appendLog(message, ts) {
-      var box = document.getElementById('bridgeLogs');
-      var time = ts ? new Date(ts).toLocaleTimeString('ru-RU') : new Date().toLocaleTimeString('ru-RU');
-      box.textContent += '[' + time + '] ' + message + '\n';
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function connectSocket() {
-      if (typeof io !== 'function') return;
-      var socket = io();
-      socket.on('bridge-log', function(entry){ appendLog(entry.message, entry.ts); });
-      socket.on('bridge-update', renderState);
+        var logs = (data.logs || []).map(function(item){
+          return '[' + new Date(item.at).toLocaleTimeString('ru-RU') + '] ' +
+                 (item.level === 'error' ? '✖ ' : '• ') + item.message;
+        }).join('\n');
+        document.getElementById('tuyaLogs').textContent = logs || 'Пока логов нет.';
+      }).catch(function(){});
     }
   </script>
 </body>
