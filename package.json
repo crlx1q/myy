@@ -1,12 +1,11 @@
 {
   "name": "smart-home-dashboard",
-  "version": "2.1.0",
-  "description": "Smart Home Dashboard — Koyeb-ready + мост Tuya OpenAPI",
-  "main": "app.js",
+  "version": "3.0.0",
+  "description": "Smart Home Dashboard — устройства из Tuya Cloud (Koyeb-ready)",
+  "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js",
-    "start:legacy": "node server.js"
+    "start": "node index.js",
+    "dev": "node server.js"
   },
   "engines": {
     "node": ">=18"
