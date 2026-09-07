@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="mobileoptimized" content="0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Living Worlds - стенд качества</title>
+<style>
+* { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+html, body { height: 100%; }
+body { margin:0; background:#000; color:#ddd;
+  font:12px/1.2 Arial,Helvetica,sans-serif; overflow:hidden; }
+#stage { position:absolute; left:0; top:0; right:0; bottom:0; overflow:hidden; }
+#lw-canvas { position:absolute; left:0; top:0; z-index:0;
+  image-rendering:-moz-crisp-edges; image-rendering:crisp-edges; image-rendering:pixelated; }
+#hud { position:absolute; left:0; top:0; right:0; z-index:2; padding:3px 4px;
+  background:rgba(0,0,0,0.55); font-size:11px; text-shadow:0 1px 2px #000; }
+#hud i { color:#7fd8ff; font-style:normal; }
+#toggle { position:absolute; right:3px; top:36px; z-index:6; }
+#panel { position:absolute; left:0; right:0; bottom:0; z-index:5; max-height:70%;
+  overflow:auto; background:#0b0b0b; border-top:1px solid #333; padding:4px 4px 8px 4px; }
+.r { margin-bottom:3px; white-space:nowrap; }
+.r .l { display:inline-block; width:56px; color:#888; font-size:11px; vertical-align:middle; }
+button { font:11px Arial,sans-serif; color:#ccc; background:#1c1c1c;
+  border:1px solid #3a3a3a; padding:4px 5px; margin:0 2px 2px 0; border-radius:3px; }
+button.on { background:#25b562; color:#000; border-color:#25b562; }
+button.act { background:#233; color:#9ee; padding:5px 7px; }
+#out { margin-top:4px; color:#9fdc9f; font:10px/1.35 monospace; white-space:pre; }
+</style>
+</head>
+<body>
+<div id="stage">
+	<canvas id="lw-canvas" width="320" height="240"></canvas>
+	<div id="hud">загрузка&hellip;</div>
+</div>
+<button id="toggle">скрыть</button>
+<div id="panel"></div>
+
+<script src="lw/config.js"></script>
+<script src="lw/living-worlds.js"></script>
+<script>
+/* Living Worlds tuning bench.
+ *
+ * Standalone page: it does NOT touch SmartHome. Its whole job is to let you
+ * push the levers down on the real device until the picture is smooth, then
+ * hand you the exact settings to use.
+ *
+ * The engine stores its levers in localStorage under 'lw.quality.v1', and
+ * localStorage is per-origin, so whatever you settle on here is already in
+ * effect on "index mini.html" when you open it next. The URL line printed by
+ * the URL button is only needed if you want to pin the settings explicitly. */
+;(function () {
+	'use strict'
+
+	function $(id) { return document.getElementById(id) }
+
+	var panel = $('panel')
+
+	/* Scrolling a DOM overlay on top of a live canvas is what actually killed
+	 * the frame rate on the Galaxy Ace (~6 fps while dragging the levers).
+	 * Freeze the renderer while the panel is being scrolled and bring it back
+	 * 400 ms after the last scroll event. */
+	var scrollIdle = 0
+	if (panel && panel.addEventListener) {
+		panel.addEventListener('scroll', function () {
+			if (!window.LW || !LW.pause) return
+			if (!scrollIdle) LW.pause('scroll')
+			else window.clearTimeout(scrollIdle)
+			scrollIdle = window.setTimeout(function () {
+				scrollIdle = 0
+				LW.resume('scroll')
+			}, 400)
+		}, false)
+	}
+	var hud = $('hud')
+	var out = null
+	var rows = []
+	var fakeSec = -1
+	var lastFrames = 0
+	var lastAt = 0
+	var curFps = 0
+
+	if (!window.LW) {
+		hud.innerHTML = 'lw/living-worlds.js не загрузился'
+		return
+	}
+
+	LW.init()
+	LW.setActive(true)
+	/* Same shape as SmartHome's weatherData, so the normal scene picker runs. */
+	LW.setWeather({ temp: 25, humidity: 60, icon: '04d', main: 'clouds', description: 'облачно с прояснениями' })
+
+	function Q() { return LW.status().quality }
+
+	/* ---- controls ------------------------------------------------------ */
+
+	function addRow(label, vals, labels, get, set) {
+		var d = document.createElement('div')
+		d.className = 'r'
+		var s = document.createElement('span')
+		s.className = 'l'
+		s.appendChild(document.createTextNode(label))
+		d.appendChild(s)
+		var btns = []
+		for (var i = 0; i < vals.length; i++) {
+			var b = document.createElement('button')
+			b.appendChild(document.createTextNode(labels ? labels[i] : '' + vals[i]))
+			b.onclick = (function (v) {
+				return function () {
+					set(v)
+					sync()
+				}
+			})(vals[i])
+			d.appendChild(b)
+			btns.push({ b: b, v: vals[i] })
+		}
+		d._btns = btns
+		d._get = get
+		panel.appendChild(d)
+		rows.push(d)
+	}
+
+	function addActions(label, defs) {
+		var d = document.createElement('div')
+		d.className = 'r'
+		var s = document.createElement('span')
+		s.className = 'l'
+		s.appendChild(document.createTextNode(label))
+		d.appendChild(s)
+		for (var i = 0; i < defs.length; i++) {
+			var b = document.createElement('button')
+			b.className = 'act'
+			b.appendChild(document.createTextNode(defs[i][0]))
+			b.onclick = defs[i][1]
+			d.appendChild(b)
+		}
+		panel.appendChild(d)
+	}
+
+	function sync() {
+		for (var i = 0; i < rows.length; i++) {
+			var d = rows[i]
+			var cur = d._get()
+			for (var j = 0; j < d._btns.length; j++) {
+				d._btns[j].b.className = d._btns[j].v === cur ? 'on' : ''
+			}
+		}
+	}
+
+	/* 'high' is not offered: on a Galaxy Ace it ran a few seconds and the
+	 * phone rebooted. It is still reachable with ?lw=high if you insist. */
+	addRow('Профиль', ['off', 'still', 'nano', 'ace', 'low', 'medium'], null,
+		function () { return Q().preset },
+		function (v) { LW.setPreset(v) })
+
+	addRow('Пиксели', [1, 2, 3, 4, 5, 6, 8], ['÷1', '÷2', '÷3', '÷4', '÷5', '÷6', '÷8'],
+		function () { return Q().scale },
+		function (v) { LW.set({ scale: v }) })
+
+	addRow('FPS', [2, 4, 6, 8, 10, 15, 20, 30], null,
+		function () { return Q().fps },
+		function (v) { LW.set({ fps: v }) })
+
+	addRow('Свет, с', [15, 30, 60, 120, 300], null,
+		function () { return Q().todStep },
+		function (v) { LW.set({ todStep: v }) })
+
+	addRow('Сглаж.', [0, 1], ['выкл', 'вкл'],
+		function () { return Q().blendShift ? 1 : 0 },
+		function (v) { LW.set({ blendShift: v === 1 }) })
+
+	addRow('Блит', [0, 1], ['весь', 'только аним.'],
+		function () { return Q().dirty ? 1 : 0 },
+		function (v) { LW.set({ dirty: v === 1 }) })
+
+	addRow('Аним.', [0, 1], ['только свет', 'полная'],
+		function () { return Q().animate === false ? 0 : 1 },
+		function (v) { LW.set({ animate: v === 1 }) })
+
+	addRow('Кроп', ['cover', 'contain', 'fill'], null,
+		function () { return Q().fit },
+		function (v) { LW.set({ fit: v }) })
+
+	addRow('Время', [-1, 10800, 32400, 43200, 61500, 75600], ['реал.', '03:00', '09:00', '12:00', '17:05', '21:00'],
+		function () { return fakeSec },
+		function (v) {
+			fakeSec = v
+			pushFake()
+		})
+
+	addActions('Сцена', [
+		['◀', function () { stepScene(-1) }],
+		['▶', function () { stepScene(1) }],
+		['самая тяжёлая', function () { holdScene(9) }],
+		['авто', function () { LW.set({ sceneCheckMin: 5 }) }]
+	])
+
+	addActions('Тест', [
+		['АВТОТЕСТ', runBench],
+		['ВЕСЬ ЭКРАН', goFullscreen],
+		['URL', showUrl],
+		['СБРОС', reset]
+	])
+
+	out = document.createElement('div')
+	out.id = 'out'
+	panel.appendChild(out)
+
+	function say(t) {
+		out.innerHTML = ''
+		out.appendChild(document.createTextNode(t))
+	}
+
+	/* ---- scene override ------------------------------------------------ */
+
+	function holdScene(i) {
+		/* Park the automatic month/weather check so a hand-picked scene stays
+		 * put while you tune. The "авто" button puts it back. */
+		LW.set({ sceneCheckMin: 600 })
+		LW.forceScene(i)
+	}
+
+	function stepScene(delta) {
+		var n = (LW.scenes && LW.scenes.length) || 22
+		var at = LW.status().sceneIdx
+		if (at < 0) at = 0
+		holdScene(((at + delta) % n + n) % n)
+	}
+
+	/* ---- benchmark ----------------------------------------------------- */
+
+	function pad(v, n) {
+		var s = '' + v
+		while (s.length < n) s += ' '
+		return s
+	}
+
+	function runBench() {
+		say('замер… картинка на пару секунд замрёт')
+		window.setTimeout(function () {
+			var res = LW.bench({ scales: [1, 2, 3, 4, 5, 6, 8], iters: 12 })
+			if (!res || !res.length) {
+				say('сцена ещё не загрузилась, повтори через пару секунд')
+				return
+			}
+			var want = Q().fps || 15
+			/* The bench times palette cycling + renderInto only. On the device
+			 * the rest of the frame - putImageData, stretching the buffer to the
+			 * screen, compositing the UI - costs several times more, and that
+			 * part belongs to the browser, not to us. Measured on a Galaxy Ace:
+			 * the bench claimed 122 fps at ÷3, the page held ~20. */
+			var DERATE = 6
+			var best = null
+			var t = 'дел.  буфер     аним%  бокс%  мс     максFPS  ~реал\n'
+			for (var i = 0; i < res.length; i++) {
+				var r = res[i]
+				t += pad('÷' + r.scale, 6) + pad(r.w + 'x' + r.h, 11) + pad(r.animPct, 7) +
+					pad(r.boxPct, 7) + pad(r.ms, 7) + pad(r.maxFps, 9) +
+					Math.round(r.maxFps / DERATE) + '\n'
+				if (!best && r.maxFps >= want * DERATE) best = r
+			}
+			if (best) {
+				t += '\nбери ÷' + best.scale + ' (' + best.w + 'x' + best.h + ') при ' + want +
+					' FPS\nзапас по счёту x' + Math.floor(best.maxFps / want)
+			} else {
+				var soft = res[res.length - 1]
+				for (var j = 0; j < res.length; j++) {
+					if (res[j].maxFps >= want * 3) {
+						soft = res[j]
+						break
+					}
+				}
+				t += '\nдля ' + want + ' FPS запаса нет.\nварианты: FPS ' +
+					Math.max(4, Math.round(soft.maxFps / DERATE)) + ', ÷' + soft.scale +
+					', или профиль still'
+			}
+			t += '\n\nмаксFPS - это только счёт палитры.\n~реал - с учётом растяжки на экран (÷' + DERATE + ').'
+			say(t)
+			sync()
+		}, 60)
+	}
+
+	/* ---- fullscreen ---------------------------------------------------- */
+
+	function goFullscreen() {
+		var how = LW.fullscreen({ scrollTrick: true })
+		if (how) {
+			say('сработало: ' + how + '\nвыйти - кнопка Назад на телефоне')
+			return
+		}
+		say('API недоступен.\nОткрой about:config и поставь:\n' +
+			'  full-screen-api.enabled = true\n' +
+			'  full-screen-api.allow-trusted-requests-only = false\n' +
+			'потом перезагрузи страницу.')
+	}
+
+	/* ---- settings export ----------------------------------------------- */
+
+	function showUrl() {
+		var q = Q()
+		say('настройки уже сохранены и подхватятся\nавтоматически. Закрепить жёстко:\n\n' +
+			'?lw=' + q.preset +
+			'&lwfps=' + q.fps +
+			'&lwscale=' + q.scale +
+			'&lwtod=' + q.todStep +
+			'&lwblend=' + (q.blendShift ? 1 : 0) +
+			'&lwdirty=' + (q.dirty ? 1 : 0) +
+			'&lwanim=' + (q.animate === false ? 0 : 1) +
+			'&lwfit=' + q.fit +
+			'\n\nили в коде:\nLW.set(' + JSON.stringify({
+				fps: q.fps,
+				scale: q.scale,
+				todStep: q.todStep,
+				blendShift: !!q.blendShift,
+				dirty: !!q.dirty,
+				animate: q.animate !== false,
+				fit: q.fit
+			}) + ')')
+	}
+
+	function reset() {
+		try {
+			if (window.localStorage) window.localStorage.removeItem('lw.quality.v1')
+		} catch (e) {}
+		window.location.href = window.location.pathname
+	}
+
+	/* ---- frozen clock preview ------------------------------------------ */
+
+	function pushFake() {
+		if (fakeSec < 0) return
+		var d = new Date()
+		d.setHours(Math.floor(fakeSec / 3600), Math.floor((fakeSec % 3600) / 60), fakeSec % 60, 0)
+		LW.tick(d)
+	}
+
+	/* ---- readout ------------------------------------------------------- */
+
+	function hhmm(sec) {
+		if (sec === null || typeof sec === 'undefined' || sec < 0) return '--:--'
+		var h = Math.floor(sec / 3600)
+		var m = Math.floor((sec % 3600) / 60)
+		return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m
+	}
+
+	function tickHud() {
+		pushFake()
+		var s = LW.status()
+		var q = s.quality
+		var now = (new Date()).getTime()
+		if (lastAt && now > lastAt) {
+			curFps = Math.round(((s.frames - lastFrames) * 1000 / (now - lastAt)) * 10) / 10
+		}
+		lastFrames = s.frames
+		lastAt = now
+
+		hud.innerHTML =
+			'<i>' + q.preset + '</i> ' + (s.backing || '-') + ' &divide;' + q.scale +
+			' &middot; <i>' + curFps + '</i> fps &middot; <i>' + s.avgMs + '</i> мс' +
+			(s.drops ? ' &middot; сбросов ' + s.drops : '') +
+			'<br>' + (s.scene || 'нет сцены') +
+			' &middot; аним ' + s.animPct + '% / бокс ' + s.boxPct + '%' +
+			' &middot; ' + hhmm(s.timeOffset) +
+			(fakeSec >= 0 ? ' (заморожено)' : '')
+	}
+
+	$('toggle').onclick = function () {
+		var hidden = panel.style.display === 'none'
+		panel.style.display = hidden ? 'block' : 'none'
+		this.firstChild.nodeValue = hidden ? 'скрыть' : 'рычаги'
+	}
+
+	/* Automated check: ?probe=1 waits for the scene, runs a short bench and
+	 * prints one JSON line to the console. Used by the browser smoke test. */
+	if (window.location.search.indexOf('probe=1') >= 0) {
+		window.setTimeout(function () {
+			var s = LW.status()
+			var b = LW.bench({ scales: [2, 3, 4, 6, 8], iters: 6 })
+			var fs = []
+			var el = document.documentElement
+			var names = ['requestFullscreen', 'mozRequestFullScreen', 'webkitRequestFullscreen', 'webkitRequestFullScreen', 'msRequestFullscreen']
+			for (var i = 0; i < names.length; i++) {
+				if (typeof el[names[i]] === 'function') fs.push(names[i])
+			}
+			window.console.log('PROBE ' + JSON.stringify({
+				scene: s.scene,
+				backing: s.backing,
+				animPct: s.animPct,
+				boxPct: s.boxPct,
+				dirtyRect: s.dirtyRect,
+				preset: s.quality.preset,
+				dirty: s.quality.dirty,
+				animate: s.quality.animate,
+				frames: s.frames,
+				fsMethods: fs,
+				bench: b
+			}))
+		}, 4000)
+	}
+
+	window.setInterval(tickHud, 1000)
+	sync()
+	tickHud()
+	say('цель: факт. fps близко к выбранному FPS,\nа мс/кадр меньше половины бюджета.\nЖми АВТОТЕСТ - он посчитает сам.')
+})()
+</script>
+</body>
+</html>

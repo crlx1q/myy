@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=320, initial-scale=1, user-scalable=no">
+<title>LW smoke test</title>
+<style>
+html, body { margin:0; padding:0; background:#000; color:#fff; overflow:hidden;
+  width:100%; height:100%; position:fixed; font-family:sans-serif; font-size:14px; }
+.page { width:100%; height:100%; position:absolute; top:0; left:0; display:none; overflow:hidden; }
+.page.active { display:block; }
+#lw-canvas { position:absolute; left:0; top:0; z-index:0; display:none; pointer-events:none;
+  image-rendering:-moz-crisp-edges; image-rendering:crisp-edges; image-rendering:pixelated; }
+.dash-box { position:absolute; text-align:center; z-index:1; text-shadow:0 1px 3px #000,0 0 8px #000; }
+.slot-tl { top:15px; left:10px; width:45%; }
+.slot-tr { top:15px; right:10px; width:45%; }
+.slot-center { top:50%; left:0; right:0; width:100%; margin-top:-65px; }
+#clock-time { font-size:52px; font-weight:700; }
+#clock-date { font-size:13px; opacity:.85; }
+#probe { position:absolute; bottom:1px; left:1px; z-index:9; font-size:9px; line-height:11px;
+  font-family:monospace; color:#0f0; background:rgba(0,0,0,.65); }
+</style>
+</head>
+<body>
+<div class="page active" id="page-clock">
+  <canvas id="lw-canvas" width="320" height="240"></canvas>
+  <div class="dash-box slot-tl"><div>Дома</div><div style="font-size:26px">25&deg;C</div></div>
+  <div class="dash-box slot-tr"><div>Улица</div><div style="font-size:26px">31&deg;C</div></div>
+  <div class="dash-box slot-center">
+    <div id="clock-time">17:05</div>
+    <div id="clock-date">Облачно с прояснениями</div>
+  </div>
+  <div id="probe">booting…</div>
+</div>
+<div class="page" id="page-devices"></div>
+
+<script src="lw/living-worlds.js"></script>
+<script>
+// Stand-in for the SmartHome payload: exactly the shape server.js produces.
+var weatherData = { temp: 31, humidity: 62, icon: '04d', main: 'clouds', description: 'облачно с прояснениями' };
+
+function showPage(n) {
+  document.getElementById('page-clock').className = 'page' + (n === 0 ? ' active' : '');
+  document.getElementById('page-devices').className = 'page' + (n === 1 ? ' active' : '');
+  if (window.LW) { LW.setActive(n === 0); }
+}
+
+if (window.LW) {
+  LW.init();
+  LW.setWeather(weatherData);
+}
+
+function hhmm(sec) {
+  if (sec === null || sec === undefined) return '-';
+  var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+  return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+}
+
+// Report what actually happened, for the headless screenshot.
+var SHOT = location.search.indexOf('shot=1') >= 0;
+setTimeout(function () {
+  var p = document.getElementById('probe');
+  if (!window.LW) { p.innerHTML = 'LW MISSING'; return; }
+  var s = LW.status();
+  var c = document.getElementById('lw-canvas');
+  var painted = 'n/a';
+  try {
+    var d = c.getContext('2d').getImageData(c.width >> 1, c.height >> 1, 1, 1).data;
+    painted = d[0] + ',' + d[1] + ',' + d[2];
+  } catch (e) { painted = 'err'; }
+  p.innerHTML =
+    '#' + s.sceneIdx + ' ' + s.scene +
+    '<br>mode=' + s.mode + ' owm=' + (s.weather ? s.weather.main + '/' + s.weather.icon : '-') +
+    '<br>preset=' + s.quality.preset + ' fps=' + s.quality.fps + ' scale=' + s.quality.scale +
+    ' blend=' + s.quality.blendShift +
+    '<br>backing=' + s.backing + ' css=' + c.style.width + 'x' + c.style.height + ' fit=' + s.quality.fit +
+    '<br>tod=' + hhmm(s.timeOffset) + ' todStep=' + s.quality.todStep + 's anim=' + s.animPct + '%' +
+    '<br>frames=' + s.frames + ' avgMs=' + s.avgMs + ' drops=' + s.drops +
+    '<br>running=' + s.running + ' active=' + s.active + ' paused=' + s.paused +
+    '<br>audioEls=' + document.getElementsByTagName('audio').length +
+    ' canvases=' + document.getElementsByTagName('canvas').length +
+    '<br>docScroll=' + document.documentElement.scrollWidth + 'x' + document.documentElement.scrollHeight +
+    ' win=' + window.innerWidth + 'x' + window.innerHeight;
+  // Headless screenshot mode: stop every timer so the browser can go idle.
+  if (SHOT) { LW.pause('shot'); }
+}, SHOT ? 2500 : 7000);
+</script>
+</body>
+</html>
