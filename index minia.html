@@ -610,7 +610,17 @@ function updateClock() {
 
 // Показать страницу
 function showPage(n) {
-    /* LW:BEGIN */ if (window.LW) { LW.setActive(n === 0); } /* LW:END */
+    /* LW:BEGIN */
+    if (window.LW) {
+        if (n === 0) {
+            LW.setActive(true);
+            if (LW.resume) LW.resume('menu');
+        } else {
+            if (LW.pause) LW.pause('menu');
+            LW.setActive(false);
+        }
+    }
+    /* LW:END */
     $('page-clock').className = 'page' + (n === 0 ? ' active' : '');
     $('page-forecast').className = 'page' + (n === 2 ? ' active' : '');
     $('page-devices').className = 'page' + (n === 1 ? ' active' : '');
@@ -1239,7 +1249,7 @@ if (document.readyState === 'complete') {
 <!-- lw/config.js is a plain settings file: profile = ace, fps = 20, ... -->
 <script src="lw/config.js"></script>
 <script src="lw/living-worlds.js"></script>
-<script>if (window.LW) { LW.init(); }</script>
+<script>if (window.LW) { LW.init(); LW.setActive(true); }</script>
 <!-- LW:END -->
 <script>
 // ---- Авто-возврат на главный экран ----------------------------------------
@@ -1268,9 +1278,18 @@ function resetPageReturnTimer() {
     }
 }
 
-// Перехватываем showPage чтобы запускать таймер при переключении страниц
+// Перехватываем showPage: таймер возврата + пауза фоновой анимации при открытии меню
 var _origShowPage = showPage;
 showPage = function (n) {
+    if (window.LW) {
+        if (n === 0) {
+            LW.setActive(true);
+            if (LW.resume) LW.resume('menu');
+        } else {
+            if (LW.pause) LW.pause('menu');
+            LW.setActive(false);
+        }
+    }
     _origShowPage(n);
     resetPageReturnTimer();
 };
