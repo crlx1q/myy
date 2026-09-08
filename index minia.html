@@ -886,21 +886,21 @@ function renderDevices() {
     } else {
         list.innerHTML = html;
     }
-    
-    // Добавляем обработчики кликов
-    var divs = list.getElementsByClassName('device');
-    for (var j = 0; j < divs.length; j++) {
-        divs[j].onclick = function() {
-            var el = this;
-            if (el.getAttribute('data-toggle') !== '1') return;
-            
-            var deviceId = el.getAttribute('data-id');
-            var isCurrentlyOn = el.getAttribute('data-on') === '1';
-            var cmd = isCurrentlyOn ? 'off' : 'on';
-            
-            controlDevice(deviceId, cmd);
-        };
-    }
+    // Обработчик кликов — делегированный на контейнер (не создаём замыкания в цикле).
+    // Ставится только один раз: если он уже есть, старый перезаписывается без накопления.
+    list.onclick = function(e) {
+        var el = e ? e.target : window.event.srcElement;
+        // Ищем ближайший .device
+        while (el && el !== list) {
+            if (el.className && el.className.indexOf('device') >= 0) break;
+            el = el.parentNode;
+        }
+        if (!el || el === list) return;
+        if (el.getAttribute('data-toggle') !== '1') return;
+        var deviceId = el.getAttribute('data-id');
+        var isCurrentlyOn = el.getAttribute('data-on') === '1';
+        controlDevice(deviceId, isCurrentlyOn ? 'off' : 'on');
+    };
 }
 
 // Управление устройством через GET запрос
@@ -930,8 +930,12 @@ function controlDevice(deviceId, command) {
 }
 
 // Получить данные с сервера
+var fetchXhr = null;  // защита от concurrent запросов
 function fetchData() {
+    // Если предыдущий запрос ещё не завершился — пропускаем (экономим память на Ace)
+    if (fetchXhr && fetchXhr.readyState !== 4) return;
     var xhr = new XMLHttpRequest();
+    fetchXhr = xhr;
     var url = '/api/mini/data?_=' + new Date().getTime();
     
     xhr.open('GET', url, true);
@@ -939,6 +943,7 @@ function fetchData() {
     
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
+            fetchXhr = null;
             if (xhr.status === 200) {
                 try {
                     var data = JSON.parse(xhr.responseText);
@@ -984,6 +989,7 @@ function fetchData() {
     };
     
     xhr.onerror = function() {
+        fetchXhr = null;
         setOnline(false);
         errorCount++;
         if (errorCount > 5) {
@@ -992,6 +998,7 @@ function fetchData() {
     };
     
     xhr.ontimeout = function() {
+        fetchXhr = null;
         setOnline(false);
         errorCount++;
         if (errorCount > 3) {
@@ -1233,8 +1240,8 @@ function init() {
     if (burninTimer) clearInterval(burninTimer);
     burninTimer = setInterval(checkBurnin, 15000);
     
-    // Polling каждые 5 секунд
-    pollInterval = setInterval(fetchData, 5000);
+    // Polling каждые 15 секунд (на Ace 5 сек = слишком часто: XHR+JSON.parse+innerHTML × 12/мин)
+    pollInterval = setInterval(fetchData, 15000);
     setInterval(loadDisplayConfigMini, 60000);
 }
 
