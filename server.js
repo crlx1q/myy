@@ -112,7 +112,11 @@ let settings = {
     requireDashboardPin: false
 };
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '651956';
+// No hardcoded admin password: unset ADMIN_PASSWORD disables admin access.
+const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || '').trim();
+function hasAdminPassword() {
+    return ADMIN_PASSWORD.length > 0;
+}
 
 // Очереди и состояние обновлений устройств
 let deviceRefreshQueue = [];
@@ -272,7 +276,7 @@ app.post('/api/dashboard/unlock', (req, res) => {
 
 app.post('/api/admin/verify', (req, res) => {
     const password = String((req.body && req.body.password) || '').trim();
-    if (password === ADMIN_PASSWORD) {
+    if (hasAdminPassword() && password === ADMIN_PASSWORD) {
         return res.json({ success: true });
     }
     return res.status(401).json({ success: false, error: 'Неверный пароль администратора' });
@@ -280,7 +284,7 @@ app.post('/api/admin/verify', (req, res) => {
 
 app.post('/api/admin/pin', (req, res) => {
     const password = String((req.body && req.body.password) || '').trim();
-    if (password !== ADMIN_PASSWORD) {
+    if (!hasAdminPassword() || password !== ADMIN_PASSWORD) {
         return res.status(401).json({ success: false, error: 'Неверный пароль администратора' });
     }
 
@@ -1203,7 +1207,7 @@ function getBaseUrl(req) {
     return `${proto}://${host}`;
 }
 function checkAdmin(req, res) {
-    if (req.query.admin !== ADMIN_PASSWORD) {
+    if (!hasAdminPassword() || req.query.admin !== ADMIN_PASSWORD) {
         res.status(401).type('text/plain').send('Требуется ?admin=<пароль>');
         return false;
     }
