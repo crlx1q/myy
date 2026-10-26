@@ -1,6 +1,7 @@
 // ==========================================
 // Конфигурация Tuya Cloud
-// Приоритет: админка (data/tuya-keys.json) > переменные окружения > фолбэк в коде
+// Приоритет: админка (data/tuya-keys.json) > переменные окружения > значения по умолчанию.
+// Секреты Tuya в репозитории не храним: задавайте их через админку или переменные окружения.
 // ==========================================
 const path = require('path');
 const fs = require('fs-extra');
@@ -8,8 +9,8 @@ const fs = require('fs-extra');
 const KEYS_FILE = path.join(__dirname, '..', 'data', 'tuya-keys.json');
 
 const DEFAULTS = {
-    TUYA_CLIENT_ID: '3efgnhtcmqtc4h7fxk8c',
-    TUYA_CLIENT_SECRET: 'd45bde1ed4a443bfa09437e52ae188ce',
+    TUYA_CLIENT_ID: '',
+    TUYA_CLIENT_SECRET: '',
     TUYA_ENDPOINT: 'https://openapi.tuyaeu.com',
     TUYA_PROJECT_CODE: 'p1786794003140jfs89g',
     // Известные устройства (фолбэк, если список из облака не пришёл)
